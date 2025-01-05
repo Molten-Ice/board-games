@@ -1,43 +1,37 @@
 import random
 
-class HexTile:
-    def __init__(self, resource_type, number_token, q=0, r=0):
+class HexCell:
+    def __init__(self, x, y, resource_type=None, number_token=None):
+        self.x = x
+        self.y = y
         self.resource_type = resource_type
         self.number_token = number_token
-        self.adjacent_tiles = []
-        self.vertices = []
-        self.q = q
-        self.r = r
-
-class Edge:
-    def __init__(self, vertex1, vertex2):
-        self.vertices = (vertex1, vertex2)  # Store as tuple for immutability
-        self.owner = None
-        self.connected_tiles = []  # Tiles this edge borders
+        self.adjacent_tiles = []  # Keep this for compatibility with number token assignment
 
     def __repr__(self):
-        return f"Edge(vertices={self.vertices}, owner={self.owner}, connected_tiles={self.connected_tiles})"
+        return f"HexCell(x={self.x}, y={self.y}, res={self.resource_type}, num={self.number_token})"
 
-class Vertex:
-    """
-    Revised Vertex class that can represent multiple (q, r, corner_index)
-    references (corners) for the same physical spot.
-    """
-    def __init__(self, q, r, corner_index):
-        # Start corners as a list containing the first corner
-        self.corners = [(q, r, corner_index)]
+class EdgeCell:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.owner = None
+        self.connected_tiles = []  # Keep for compatibility
 
-        self.q = q
-        self.r = r
-        self.corner_index = corner_index
+    def __repr__(self):
+        return f"EdgeCell(x={self.x}, y={self.y}, owner={self.owner})"
 
-        self.connected_tiles = []
-        self.connected_vertices = []
+class VertexCell:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
         self.owner = None
         self.building = None
+        self.connected_tiles = []  # Keep for compatibility
+        self.connected_vertices = []  # Keep for adjacency checks
 
     def __repr__(self):
-        return f"Vertex(corners={self.corners}, owner={self.owner}, building={self.building})"
+        return f"VertexCell(x={self.x}, y={self.y}, owner={self.owner}, building={self.building})"
 
 class Road:
     """
@@ -66,37 +60,39 @@ class Player:
 
 class Board:
     def __init__(self):
-        self.tiles = []
-        # We will store each physical vertex in a dictionary keyed by
-        # a consistent corner-key so we don’t create duplicates.
-        self.vertices = []
-        self.edges = {}
+        self.HEX_W = 5  # Width of the hex grid
+        self.HEX_H = 5  # Height of the hex grid
+        self.ARR_W = 2 * self.HEX_W + 2  # Width of edge/vertex arrays
+        self.ARR_H = 2 * self.HEX_H + 2  # Height of edge/vertex arrays
+
+        # Initialize empty matrices
+        self.hexes = [[None for _ in range(self.HEX_H)] for _ in range(self.HEX_W)]
+        self.edges = [[None for _ in range(self.ARR_H)] for _ in range(self.ARR_W)]
+        self.vertices = [[None for _ in range(self.ARR_H)] for _ in range(self.ARR_W)]
+
+        # Initialize other board properties
         self.bank = {
-            'wood': 19,
-            'brick': 19,
-            'sheep': 19,
-            'wheat': 19,
-            'ore': 19
+            'wood': 19, 'brick': 19, 'sheep': 19,
+            'wheat': 19, 'ore': 19
         }
         self.players = [Player(i) for i in range(1, 5)]
         self.current_player_index = 0
         self.setup_phase = False
         self.setup_round = 0
-        # Kick off board setup
+
+        # Setup the board
         self.setup_board()
 
     def setup_board(self):
         """Setup board in distinct phases"""
-        self.setup_resources()         # 1) Create tiles with resources
-        self.connect_adjacent_tiles()  # 2) Connect neighboring tiles
-        self.assign_valid_number_tokens()  # 3) Assign dice numbers
-        
-        self.create_vertices()         # 4) Create vertices (with corner reps)
-        # self.create_edges()            # 5) Create edges between vertices
-
+        self.setup_resources()
+        self.connect_adjacent_tiles()
+        self.assign_valid_number_tokens()
+        self.create_vertices()
+        self.create_edges()
 
     def setup_resources(self):
-        """Phase 1: Setup resources only"""
+        """Convert the old coordinate system to the new matrix-based one"""
         resources = [
             'wood', 'wood', 'wood', 'wood',
             'brick', 'brick', 'brick',
@@ -107,39 +103,41 @@ class Board:
         ]
         random.shuffle(resources)
 
-        # Proper axial coordinates for a standard Catan layout
-        grid_positions = [
-            [(-2,0), (-1,-1), (0,-2)],              
-            [(-2,1), (-1,0), (0,-1), (1,-2)],       
-            [(-2,2), (-1,1), (0,0), (1,-1), (2,-2)],
-            [(-1,2), (0,1), (1,0), (2,-1)],         
-            [(0,2), (1,1), (2,0)]
+        # Define the valid hex positions in the matrix
+        valid_positions = [
+            [(1,1), (2,1), (3,1)],              
+            [(1,2), (2,2), (3,2), (4,2)],       
+            [(0,3), (1,3), (2,3), (3,3), (4,3)],
+            [(1,4), (2,4), (3,4), (4,4)],         
+            [(2,5), (3,5), (4,5)]
         ]
 
-        tile_index = 0
-        for row in grid_positions:
-            for q, r in row:
-                resource = resources[tile_index]
-                tile = HexTile(resource, 0, q, r)
-                self.tiles.append(tile)
-                tile_index += 1
+        resource_index = 0
+        for row in valid_positions:
+            for x, y in row:
+                if resource_index < len(resources):
+                    self.hexes[x][y] = HexCell(x, y, resources[resource_index])
+                    resource_index += 1
 
     def connect_adjacent_tiles(self):
-        """
-        Phase 2: Set the adjacency relationships among tiles 
-        (this helps us detect adjacent 6/8 tiles, among other things).
-        """
-        directions = [(1,0), (1,-1), (0,-1), (-1,0), (-1,1), (0,1)]
-        for tile1 in self.tiles:
-            for dq, dr in directions:
-                q2 = tile1.q + dq
-                r2 = tile1.r + dr
-                for tile2 in self.tiles:
-                    if tile2.q == q2 and tile2.r == r2:
-                        if tile2 not in tile1.adjacent_tiles:
-                            tile1.adjacent_tiles.append(tile2)
-                        if tile1 not in tile2.adjacent_tiles:
-                            tile2.adjacent_tiles.append(tile1)
+        """Set adjacency relationships among tiles in the matrix."""
+        for x in range(self.HEX_W):
+            for y in range(self.HEX_H):
+                if self.hexes[x][y]:
+                    # Get neighbors using matrix offsets
+                    offset = 1 if (x % 2 == 0) else -1
+                    neighbor_coords = [
+                        (x, y+1), (x, y-1),      # above/below
+                        (x+1, y), (x-1, y),      # right/left
+                        (x+1, y+offset),         # diagonal right
+                        (x-1, y+offset)          # diagonal left
+                    ]
+                    
+                    for nx, ny in neighbor_coords:
+                        if (0 <= nx < self.HEX_W and 
+                            0 <= ny < self.HEX_H and 
+                            self.hexes[nx][ny]):
+                            self.hexes[x][y].adjacent_tiles.append(self.hexes[nx][ny])
 
     def equivalent_vertex(self, tuple1, tuple2):
         """Input two (q, r, corner_index) tuples and return True if they are equivalent."""
@@ -180,87 +178,49 @@ class Board:
         return False
 
     def create_vertices(self):
-        """
-        1) For each tile, for each of its 6 corners, generate a consistent identifier.
-        2) If that identifier is not already in self.vertices, create a new Vertex.
-        3) Otherwise reuse the existing Vertex.
-        4) Add this corner representation (q, r, corner_index) to the vertex.
-        5) Link tile <-> vertex if needed.
-        """
-        self.vertices = []  # reset any existing list
-        for tile in self.tiles:
-            # Make sure tile.vertices starts empty so we can populate it fresh
-            tile.vertices = []
-
-            q, r = tile.q, tile.r
-            for corner_index in range(6):
-                matching_vertex = None
-                for v in self.vertices:
-                    if self.equivalent_vertex((q, r, corner_index), (v.q, v.r, v.corner_index)):
-                        matching_vertex = v
-                        break
-
-                if not matching_vertex:
-                    new_v = Vertex(q, r, corner_index)
-                    self.vertices.append(new_v)
-                    # Attach tile <--> vertex
-                    tile.vertices.append(new_v)
-                    new_v.connected_tiles.append(tile)
-                else:
-                    # Add this (q, r, corner_index) to the matching vertex's corners
-                    matching_vertex.corners.append((q, r, corner_index))
-                    # Attach tile <--> matching vertex
-                    tile.vertices.append(matching_vertex)
-                    matching_vertex.connected_tiles.append(tile)
+        """Create vertices at valid intersections in the matrix."""
+        for x in range(self.ARR_W):
+            for y in range(self.ARR_H):
+                self.vertices[x][y] = VertexCell(x, y)
+                
+                # Connect vertices to adjacent hexes
+                hex_coords = self._get_adjacent_hexes(x, y)
+                for hx, hy in hex_coords:
+                    if (0 <= hx < self.HEX_W and 
+                        0 <= hy < self.HEX_H and 
+                        self.hexes[hx][hy]):
+                        self.vertices[x][y].connected_tiles.append(self.hexes[hx][hy])
 
     def create_edges(self):
-        """
-        1) For each tile, for each of its 6 edges, get the two vertices that define it.
-        2) If that edge doesn't exist, create it.
-        3) Store in self.edges dictionary with a consistent key for the vertex pair.
-        4) Also link vertex.connected_vertices for adjacency checks.
-        """
-        self.edges = {}
+        """Create edges between valid vertices in the matrix."""
+        for x in range(self.ARR_W):
+            for y in range(self.ARR_H):
+                self.edges[x][y] = EdgeCell(x, y)
+                
+                # Connect edges to adjacent hexes
+                hex_coords = self._get_adjacent_hexes_for_edge(x, y)
+                for hx, hy in hex_coords:
+                    if (0 <= hx < self.HEX_W and 
+                        0 <= hy < self.HEX_H and 
+                        self.hexes[hx][hy]):
+                        self.edges[x][y].connected_tiles.append(self.hexes[hx][hy])
 
-        for tile in self.tiles:
-            # The tile.vertices should have 6 Vertex objects in order
-            # but we can't rely on their order in a set; they might not be in corner order.
-            # So let's gather the correct Vertex objects by corner index:
-            corner_vertices = [None]*6
-            for corner_index in range(6):
-                key = self._get_vertex_key(tile.q, tile.r, corner_index)
-                corner_vertices[corner_index] = self.vertices[key]
+    def _get_adjacent_hexes(self, vx, vy):
+        """Helper to get hex coordinates adjacent to a vertex position."""
+        offset = vx % 2
+        return [
+            ((vx-1) // 2, (vy // 2) - offset),
+            (vx // 2, (vy // 2)),
+            ((vx-1) // 2, (vy // 2))
+        ]
 
-            # For each edge of the hex (i, i+1)
-            for i in range(6):
-                v1 = corner_vertices[i]
-                v2 = corner_vertices[(i + 1) % 6]
-
-                # Build a stable edge key
-                # We'll just store them sorted by Python's built-in id, or you could store references
-                v1_id, v2_id = sorted([id(v1), id(v2)])
-                edge_key = (v1_id, v2_id)
-
-                if edge_key not in self.edges:
-                    e = Edge(v1, v2)
-                    # Link to tiles that share this edge
-                    e.connected_tiles.append(tile)
-                    self.edges[edge_key] = e
-                else:
-                    # Already created by an adjacent tile
-                    existing_edge = self.edges[edge_key]
-                    # Make sure we register this tile to the edge's tile list
-                    if tile not in existing_edge.connected_tiles:
-                        existing_edge.connected_tiles.append(tile)
-
-                # For adjacency among vertices
-                if v2 not in v1.connected_vertices:
-                    v1.connected_vertices.append(v2)
-                if v1 not in v2.connected_vertices:
-                    v2.connected_vertices.append(v1)
-
-        # Convert self.edges from dict to a more standard structure
-        # or keep it as-is with the (id(v1), id(v2)) keys.
+    def _get_adjacent_hexes_for_edge(self, ex, ey):
+        """Helper to get hex coordinates adjacent to an edge position."""
+        offset = ex % 2
+        return [
+            (ex // 2, ey // 2),
+            ((ex-1) // 2, (ey // 2) - offset)
+        ]
 
     def assign_valid_number_tokens(self, max_attempts=1000):
         """
@@ -295,27 +255,47 @@ class Board:
         return False
 
     def roll_dice_and_distribute(self):
-        """
-        1) Roll 2 dice (1-6 each).
-        2) For each tile whose number matches dice_sum, distribute resources
-           to any adjacent settlements/cities.
-        """
+        """Roll dice and distribute resources using matrix positions."""
         dice1 = random.randint(1, 6)
         dice2 = random.randint(1, 6)
         dice_sum = dice1 + dice2
         
-        for tile in self.tiles:
-            if tile.number_token == dice_sum and tile.resource_type != 'desert':
-                resource = tile.resource_type
-                for vertex in tile.vertices:
-                    if vertex.owner is not None and vertex.building:
-                        owner_player = self.players[vertex.owner - 1]
-                        amount = 2 if vertex.building == 'city' else 1
-                        if self.bank[resource] >= amount:
-                            self.bank[resource] -= amount
-                            owner_player.resources[resource] += amount
-
+        for x in range(self.HEX_W):
+            for y in range(self.HEX_H):
+                hex_cell = self.hexes[x][y]
+                if (hex_cell and 
+                    hex_cell.number_token == dice_sum and 
+                    hex_cell.resource_type != 'desert'):
+                    
+                    # Find connected vertices with settlements/cities
+                    vertex_coords = self._get_hex_vertices(x, y)
+                    for vx, vy in vertex_coords:
+                        if (0 <= vx < self.ARR_W and 
+                            0 <= vy < self.ARR_H and 
+                            self.vertices[vx][vy] and 
+                            self.vertices[vx][vy].owner is not None):
+                            
+                            vertex = self.vertices[vx][vy]
+                            amount = 2 if vertex.building == 'city' else 1
+                            resource = hex_cell.resource_type
+                            
+                            if self.bank[resource] >= amount:
+                                self.bank[resource] -= amount
+                                self.players[vertex.owner - 1].resources[resource] += amount
+                                
         return dice1, dice2
+
+    def _get_hex_vertices(self, hx, hy):
+        """Get vertex coordinates for a hex position."""
+        offset = hx % 2
+        return [
+            (2*hx, 2*hy + offset),
+            (2*hx, 2*hy + 1 + offset),
+            (2*hx, 2*hy + 2 + offset),
+            (2*hx+1, 2*hy + offset),
+            (2*hx+1, 2*hy + 1 + offset),
+            (2*hx+1, 2*hy + 2 + offset)
+        ]
 
     def next_player_turn(self):
         """
@@ -335,31 +315,33 @@ class Board:
 
 
     def get_valid_settlement_spots(self, player):
-        """
-        Return a list of vertices where the given player *could* place a new settlement.
-        Rules:
-         - Vertex must not be occupied
-         - Must be at least 2 edges away from any other settlement
-         - Must be connected to at least one tile (not off-board)
-        """
+        """Return valid vertex positions for settlements."""
         valid_spots = []
-        for v in self.vertices:
-            if (v.owner is None
-                and not self._has_nearby_settlement(v)
-                and len(v.connected_tiles) > 0):
-                valid_spots.append(v)
-
-        print(f"Found {len(valid_spots)} valid settlement spots")
+        for x in range(self.ARR_W):
+            for y in range(self.ARR_H):
+                vertex = self.vertices[x][y]
+                if (vertex and 
+                    vertex.owner is None and 
+                    not self._has_nearby_settlement(vertex) and 
+                    len(vertex.connected_tiles) > 0):
+                    valid_spots.append(vertex)
         return valid_spots
 
     def _has_nearby_settlement(self, vertex):
-        """Check if there's any settlement within 2 edges of this vertex."""
-        for adjacent in vertex.connected_vertices:
-            if adjacent.owner is not None:
+        """Check for settlements within 2 edges using matrix positions."""
+        x, y = vertex.x, vertex.y
+        nearby_coords = [
+            (x-2, y), (x+2, y),     # left/right
+            (x-1, y-1), (x+1, y-1), # diagonals up
+            (x-1, y+1), (x+1, y+1)  # diagonals down
+        ]
+        
+        for nx, ny in nearby_coords:
+            if (0 <= nx < self.ARR_W and 
+                0 <= ny < self.ARR_H and 
+                self.vertices[nx][ny] and 
+                self.vertices[nx][ny].owner is not None):
                 return True
-            for second_adjacent in adjacent.connected_vertices:
-                if second_adjacent.owner is not None:
-                    return True
         return False
 
     def get_valid_city_spots(self, player):
@@ -374,36 +356,48 @@ class Board:
         return valid_spots
 
     def get_valid_road_spots(self, player):
-        """
-        Return all valid edges where the player could build a road.
-        (Edge must not already have a road, and must connect to the player's
-        existing road or settlement.)
-        """
+        """Return valid edge positions for roads."""
         valid_edges = []
-
-        for edge in self.edges.values():
-            # Check if edge already has a road
-            if any(road.edge == edge for p in self.players for road in p.roads):
-                continue
-
-            # Check adjacency to the player's stuff
-            has_connection = False
-            for vertex in edge.vertices:
-                if vertex.owner == player.pid:  # adjacency to a settlement
-                    has_connection = True
-                    break
-
-                # check adjacency to an existing road
-                for adj_edge in self.get_adjacent_edges(vertex):
-                    if any(road.edge == adj_edge and road.owner == player.pid
-                           for p in self.players for road in p.roads):
-                        has_connection = True
-                        break
-
-            if has_connection:
-                valid_edges.append(edge)
-
+        for x in range(self.ARR_W):
+            for y in range(self.ARR_H):
+                edge = self.edges[x][y]
+                if edge and not edge.owner:
+                    # Check connection to player's existing roads/settlements
+                    if self._is_valid_road_spot(edge, player):
+                        valid_edges.append(edge)
         return valid_edges
+
+    def _is_valid_road_spot(self, edge, player):
+        """Check if edge connects to player's existing infrastructure."""
+        x, y = edge.x, edge.y
+        
+        # Check adjacent vertices
+        vertex_coords = [
+            (x, y), (x+1, y),   # horizontal edge
+            (x, y+1), (x, y-1)  # vertical edge
+        ]
+        
+        for vx, vy in vertex_coords:
+            if (0 <= vx < self.ARR_W and 
+                0 <= vy < self.ARR_H and 
+                self.vertices[vx][vy] and 
+                self.vertices[vx][vy].owner == player.pid):
+                return True
+            
+        # Check adjacent edges
+        edge_coords = [
+            (x-1, y), (x+1, y),
+            (x, y-1), (x, y+1)
+        ]
+        
+        for ex, ey in edge_coords:
+            if (0 <= ex < self.ARR_W and 
+                0 <= ey < self.ARR_H and 
+                self.edges[ex][ey] and 
+                self.edges[ex][ey].owner == player.pid):
+                return True
+            
+        return False
     
     def get_adjacent_edges(self, vertex):
         """Get all edges connected to a vertex."""
@@ -573,3 +567,4 @@ def auto_place_initial_settlements(board):
     # for player in reversed(board.players):
     #     auto_place_settlement(board, player)
         
+

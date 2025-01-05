@@ -1,0 +1,444 @@
+{
+  "hexes": [
+    {
+      "q": -4,
+      "r": 2,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": -3,
+      "r": 0,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": -3,
+      "r": 3,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": -2,
+      "r": -2,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": -2,
+      "r": 1,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": -2,
+      "r": 4,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": -1,
+      "r": -1,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": -1,
+      "r": 2,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 0,
+      "r": -3,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 0,
+      "r": 0,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 0,
+      "r": 3,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 1,
+      "r": -2,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 1,
+      "r": 1,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 2,
+      "r": -4,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 2,
+      "r": -1,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 2,
+      "r": 2,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 3,
+      "r": -3,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 3,
+      "r": 0,
+      "resource_type": true,
+      "resource_number": null
+    },
+    {
+      "q": 4,
+      "r": -2,
+      "resource_type": true,
+      "resource_number": null
+    }
+  ],
+  "vertex_cells": [
+    {
+      "q": -5,
+      "r": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -5,
+      "r": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -4,
+      "r": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -4,
+      "r": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -4,
+      "r": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -4,
+      "r": 4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -3,
+      "r": -2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -3,
+      "r": -1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -3,
+      "r": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -3,
+      "r": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -3,
+      "r": 4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -3,
+      "r": 5,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -2,
+      "r": -3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -2,
+      "r": -1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -2,
+      "r": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -2,
+      "r": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -2,
+      "r": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -2,
+      "r": 5,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -1,
+      "r": -3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -1,
+      "r": -2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -1,
+      "r": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -1,
+      "r": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -1,
+      "r": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": -1,
+      "r": 4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 0,
+      "r": -4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 0,
+      "r": -2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 0,
+      "r": -1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 0,
+      "r": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 0,
+      "r": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 0,
+      "r": 4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 1,
+      "r": -4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 1,
+      "r": -3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 1,
+      "r": -1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 1,
+      "r": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 1,
+      "r": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 1,
+      "r": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 2,
+      "r": -5,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 2,
+      "r": -3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 2,
+      "r": -2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 2,
+      "r": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 2,
+      "r": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 2,
+      "r": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 3,
+      "r": -5,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 3,
+      "r": -4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 3,
+      "r": -2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 3,
+      "r": -1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 3,
+      "r": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 3,
+      "r": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 4,
+      "r": -4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 4,
+      "r": -3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 4,
+      "r": -1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 4,
+      "r": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 5,
+      "r": -3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "q": 5,
+      "r": -2,
+      "owner": null,
+      "building": null
+    }
+  ]
+}
