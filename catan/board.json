@@ -119,326 +119,327 @@
     {
       "q": -5,
       "r": 2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -5,
       "r": 3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -4,
       "r": 0,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -4,
       "r": 1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -4,
       "r": 3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -4,
       "r": 4,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -3,
       "r": -2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -3,
       "r": -1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -3,
       "r": 1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -3,
       "r": 2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -3,
       "r": 4,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -3,
       "r": 5,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -2,
       "r": -3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -2,
       "r": -1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -2,
       "r": 0,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -2,
       "r": 2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -2,
       "r": 3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -2,
       "r": 5,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -1,
       "r": -3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -1,
       "r": -2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -1,
       "r": 0,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -1,
       "r": 1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": -1,
       "r": 3,
-      "owner": null,
-      "building": null
+      "owner_id": 1,
+      "building": "settlement"
     },
     {
       "q": -1,
       "r": 4,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 0,
       "r": -4,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 0,
       "r": -2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 0,
       "r": -1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 0,
       "r": 1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 0,
       "r": 2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 0,
       "r": 4,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 1,
       "r": -4,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 1,
       "r": -3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 1,
       "r": -1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 1,
       "r": 0,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 1,
       "r": 2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 1,
       "r": 3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 2,
       "r": -5,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 2,
       "r": -3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 2,
       "r": -2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 2,
       "r": 0,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 2,
       "r": 1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 2,
       "r": 3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 3,
       "r": -5,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 3,
       "r": -4,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 3,
       "r": -2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 3,
       "r": -1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 3,
       "r": 1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 3,
       "r": 2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 4,
       "r": -4,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 4,
       "r": -3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 4,
       "r": -1,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 4,
       "r": 0,
-      "owner": null,
-      "building": null
+      "owner_id": 1,
+      "building": "settlement"
     },
     {
       "q": 5,
       "r": -3,
-      "owner": null,
+      "owner_id": null,
       "building": null
     },
     {
       "q": 5,
       "r": -2,
-      "owner": null,
+      "owner_id": null,
       "building": null
     }
-  ]
+  ],
+  "road_edges": {}
 }

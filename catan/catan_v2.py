@@ -1,15 +1,36 @@
 import json
 import math
+import random
 import tkinter as tk
-from PIL import Image, ImageDraw
+from enum import Enum
+
+
+"""
+TODO:
+Place stuff on a vertex (settlements, cities)
+Player resources
+bank resources (total)
+Collect resources from a hex.
+dice -> hexes -> adjacent players settlements/cities -> no wheat = Defeat
+
+# roads, dict(a, b) - > player_id
+
+
+# Last
+robber
+dev cards - largest army, longest road, victory point
+trading
+"""
 
 
 class Board:
     def __init__(self):
         self.hex_cells = []
         self.vertex_cells = []
+        self.road_edges = {}
+        self.bank = Bank()
+        self.players = [Player(pid) for pid in range(1, 5)]
 
-    
     def get_board_state(self):
         return {
             'hexes': [{
@@ -21,22 +42,44 @@ class Board:
             'vertex_cells': [{
                 'q': vertex_cell.q,
                 'r': vertex_cell.r,
-                'owner': vertex_cell.owner,
-                'building': vertex_cell.building
-            } for vertex_cell in self.vertex_cells]
+                'owner_id': vertex_cell.owner_id,
+                'building': vertex_cell.building.name if vertex_cell.building else None
+            } for vertex_cell in self.vertex_cells],
+            'road_edges': self.road_edges
         }
-    
-    def get_neighbors(self, cell):
-        def is_neighbor(spot1, spot2):
-            return abs(spot1.q - spot2.q) <= 1 and abs(spot1.r - spot2.r) <= 1
 
-        cells = self.hex_cells if isinstance(cell, HexCell) else self.vertex_cells
-        return [c for c in cells if is_neighbor(c, cell)]
+
+CellType = Enum('CellType', ['hex', 'vertex'])
+BuildingType = Enum('BuildingType', ['settlement', 'city'])
+ResourceType = Enum('ResourceType', ['wood', 'brick', 'wheat', 'sheep', 'ore'])
+    
+class Player:
+    def __init__(self, pid):
+        self.pid = pid # 1-4
+        self.resources = {
+            ResourceType.wood: 0,
+            ResourceType.brick: 0,
+            ResourceType.wheat: 0,
+            ResourceType.sheep: 0,
+            ResourceType.ore: 0
+        }
+
+class Bank:
+    def __init__(self):
+        self.resources = {
+            ResourceType.wood: 19,
+            ResourceType.brick: 19,
+            ResourceType.wheat: 19,
+            ResourceType.sheep: 19,
+            ResourceType.ore: 19
+        }
+
 
 class Cell:
-    def __init__(self, q, r):
+    def __init__(self, q, r, cell_type):
         self.q = q
         self.r = r
+        self.cell_type = cell_type
 
     def is_neighbor(self, cell):
         return abs(self.q - cell.q) <= 1 and abs(self.r - cell.r) <= 1
@@ -44,16 +87,40 @@ class Cell:
 
 class HexCell(Cell):
     def __init__(self, q, r, resource_type=None, resource_number=None):
-        super().__init__(q, r)
+        super().__init__(q, r, CellType.hex)
         self.resource_type = resource_type
         self.resource_number = resource_number
+        self.robber = False
 
 
 class VertexCell(Cell):
-    def __init__(self, q, r, owner=None, building=None):
-        super().__init__(q, r)
-        self.owner = owner
+    def __init__(self, q, r, owner_id=None, building=None):
+        super().__init__(q, r, CellType.vertex)
+        self.owner_id = owner_id
         self.building = building
+
+
+def is_neighbor(spot1, spot2):
+    diffs = [(1, 0), (0, 1), (-1, 0), (0, -1), (1, -1), (-1, 1)]
+    diff = (spot1.q - spot2.q, spot1.r - spot2.r)
+    return diff in diffs
+
+# def valid_settlements(board):
+    # Find settlement spots
+
+
+def collect_resources(board):
+    dice = random.randint(1, 6) + random.randint(1, 6)
+    for hex_cell in board.hex_cells:
+        if hex_cell.number_token != dice or hex_cell.robber:
+            continue
+        adjacent_vertex_cells = [c for c in board.vertex_cells if is_neighbor(c, hex_cell)]
+        for vertex_cell in adjacent_vertex_cells:
+            if not vertex_cell.building:
+                continue
+            factor = 1 if vertex_cell.building == BuildingType.settlement else 2
+            print(f'Collecting {factor} {hex_cell.resource_type} from {vertex_cell.owner_id}')
+            board.bank.resources[hex_cell.resource_type] += factor
 
 
 def generate_hex_grid():
@@ -106,6 +173,14 @@ def visualization_hex_coordinates(board, sf=30.0):
     canvas = tk.Canvas(root, bg='black', width=width, height=height)
     canvas.pack()
 
+    # Define colors for each player
+    player_colors = {
+        1: '#FF0000',  # Red
+        2: '#00FF00',  # Green
+        3: '#0000FF',  # Blue
+        4: '#FFFF00'   # Yellow
+    }
+
     color, point_size = '#9B6400', 5
     for hex_cell in board.hex_cells:
         q, r = hex_cell.q, hex_cell.r
@@ -116,23 +191,24 @@ def visualization_hex_coordinates(board, sf=30.0):
             fill=color, outline=color
         )
 
-    color, point_size = '#FFFFFF', 3
     for vertex_cell in board.vertex_cells:
         q, r = vertex_cell.q, vertex_cell.r
         x, y = visualization_get_hex_coordinates(q, r)
+        
+        # Check if the vertex has a building
+        if vertex_cell.building:
+            # Use a larger circle for settlements
+            point_size = 7 if vertex_cell.building == BuildingType.settlement else 5
+            color = player_colors.get(vertex_cell.owner_id, '#FFFFFF')  # Default to white if no owner
+        else:
+            point_size = 3
+            color = '#FFFFFF'  # Default color for unoccupied vertices
+
         canvas.create_oval(
             x-point_size, y-point_size, 
             x+point_size, y+point_size,
             fill=color, outline=color
         )
-
-    # Save the canvas to an image
-    def save_canvas_to_image():
-        canvas.postscript(file='canvas.ps', colormode='color')
-        img = Image.open('canvas.ps')
-        img.save('canvas_image.png', 'png')
-
-    save_canvas_to_image()
 
     root.mainloop()
 
@@ -140,6 +216,14 @@ if __name__ == "__main__":
 
     board = Board()
     board.hex_cells, board.vertex_cells = generate_hex_grid()
+
+   
+    for i in range(2):
+        vertex_cell = [v for v in board.vertex_cells if v.building is None][0]
+        vertex_cell.owner_id = 1
+        vertex_cell.building = BuildingType.settlement
+
+    print(f'len(board.vertex_cells): {len(board.vertex_cells)}')
     with open('board.json', 'w') as f:
         json.dump(board.get_board_state(), f, indent=2)
 
