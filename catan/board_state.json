@@ -1,0 +1,2251 @@
+{
+  "tiles": [
+    {
+      "q": -2,
+      "r": 0,
+      "resource_type": "desert",
+      "number_token": 0
+    },
+    {
+      "q": -1,
+      "r": -1,
+      "resource_type": "wheat",
+      "number_token": 6
+    },
+    {
+      "q": 0,
+      "r": -2,
+      "resource_type": "wheat",
+      "number_token": 2
+    },
+    {
+      "q": -2,
+      "r": 1,
+      "resource_type": "wood",
+      "number_token": 11
+    },
+    {
+      "q": -1,
+      "r": 0,
+      "resource_type": "sheep",
+      "number_token": 3
+    },
+    {
+      "q": 0,
+      "r": -1,
+      "resource_type": "sheep",
+      "number_token": 3
+    },
+    {
+      "q": 1,
+      "r": -2,
+      "resource_type": "brick",
+      "number_token": 4
+    },
+    {
+      "q": -2,
+      "r": 2,
+      "resource_type": "wood",
+      "number_token": 6
+    },
+    {
+      "q": -1,
+      "r": 1,
+      "resource_type": "wheat",
+      "number_token": 12
+    },
+    {
+      "q": 0,
+      "r": 0,
+      "resource_type": "sheep",
+      "number_token": 8
+    },
+    {
+      "q": 1,
+      "r": -1,
+      "resource_type": "sheep",
+      "number_token": 10
+    },
+    {
+      "q": 2,
+      "r": -2,
+      "resource_type": "brick",
+      "number_token": 9
+    },
+    {
+      "q": -1,
+      "r": 2,
+      "resource_type": "wood",
+      "number_token": 9
+    },
+    {
+      "q": 0,
+      "r": 1,
+      "resource_type": "wheat",
+      "number_token": 4
+    },
+    {
+      "q": 1,
+      "r": 0,
+      "resource_type": "ore",
+      "number_token": 10
+    },
+    {
+      "q": 2,
+      "r": -1,
+      "resource_type": "brick",
+      "number_token": 5
+    },
+    {
+      "q": 0,
+      "r": 2,
+      "resource_type": "wood",
+      "number_token": 8
+    },
+    {
+      "q": 1,
+      "r": 1,
+      "resource_type": "ore",
+      "number_token": 11
+    },
+    {
+      "q": 2,
+      "r": 0,
+      "resource_type": "ore",
+      "number_token": 5
+    }
+  ],
+  "bank": {
+    "wood": 19,
+    "brick": 19,
+    "sheep": 19,
+    "wheat": 19,
+    "ore": 19
+  },
+  "players": [
+    {
+      "pid": 1,
+      "resources": {
+        "wood": 0,
+        "brick": 0,
+        "wheat": 0,
+        "sheep": 0,
+        "ore": 0
+      }
+    },
+    {
+      "pid": 2,
+      "resources": {
+        "wood": 0,
+        "brick": 0,
+        "wheat": 0,
+        "sheep": 0,
+        "ore": 0
+      }
+    },
+    {
+      "pid": 3,
+      "resources": {
+        "wood": 0,
+        "brick": 0,
+        "wheat": 0,
+        "sheep": 0,
+        "ore": 0
+      }
+    },
+    {
+      "pid": 4,
+      "resources": {
+        "wood": 0,
+        "brick": 0,
+        "wheat": 0,
+        "sheep": 0,
+        "ore": 0
+      }
+    }
+  ],
+  "current_player": 1,
+  "vertices": [
+    {
+      "corners": [
+        [
+          -2,
+          0,
+          0
+        ],
+        [
+          -1,
+          -1,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 0,
+      "corner_index": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          0,
+          1
+        ],
+        [
+          0,
+          -2,
+          4
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        [
+          0,
+          -1,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 0,
+      "corner_index": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          0,
+          2
+        ],
+        [
+          -1,
+          -1,
+          3
+        ],
+        [
+          -2,
+          1,
+          1
+        ],
+        [
+          0,
+          -1,
+          4
+        ],
+        [
+          -1,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 0,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          0,
+          3
+        ],
+        [
+          -1,
+          0,
+          4
+        ],
+        [
+          -2,
+          2,
+          0
+        ],
+        [
+          -1,
+          1,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 0,
+      "corner_index": 3,
+      "owner": 1,
+      "building": "settlement"
+    },
+    {
+      "corners": [
+        [
+          -2,
+          0,
+          4
+        ],
+        [
+          -2,
+          1,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 0,
+      "corner_index": 4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          0,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 0,
+      "corner_index": 5,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -1,
+          -1,
+          0
+        ],
+        [
+          0,
+          -2,
+          5
+        ]
+      ],
+      "q": -1,
+      "r": -1,
+      "corner_index": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -1,
+          -1,
+          1
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          1,
+          -2,
+          5
+        ]
+      ],
+      "q": -1,
+      "r": -1,
+      "corner_index": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -1,
+          -1,
+          2
+        ],
+        [
+          0,
+          -2,
+          3
+        ],
+        [
+          -1,
+          0,
+          1
+        ],
+        [
+          1,
+          -2,
+          4
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          -1,
+          5
+        ]
+      ],
+      "q": -1,
+      "r": -1,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -1,
+          -1,
+          4
+        ],
+        [
+          -2,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          5
+        ]
+      ],
+      "q": -1,
+      "r": -1,
+      "corner_index": 4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          0,
+          -2,
+          0
+        ]
+      ],
+      "q": 0,
+      "r": -2,
+      "corner_index": 0,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          0,
+          -2,
+          1
+        ],
+        [
+          1,
+          -2,
+          0
+        ]
+      ],
+      "q": 0,
+      "r": -2,
+      "corner_index": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -1,
+          1
+        ],
+        [
+          1,
+          -1,
+          0
+        ],
+        [
+          2,
+          -2,
+          5
+        ]
+      ],
+      "q": 0,
+      "r": -2,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          1,
+          2
+        ],
+        [
+          -1,
+          0,
+          3
+        ],
+        [
+          -2,
+          2,
+          1
+        ],
+        [
+          0,
+          0,
+          4
+        ],
+        [
+          -1,
+          2,
+          0
+        ],
+        [
+          0,
+          1,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 1,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          1,
+          3
+        ],
+        [
+          -1,
+          1,
+          4
+        ],
+        [
+          -1,
+          2,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 1,
+      "corner_index": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          1,
+          4
+        ],
+        [
+          -2,
+          2,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 1,
+      "corner_index": 4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -1,
+          0,
+          2
+        ],
+        [
+          0,
+          -1,
+          3
+        ],
+        [
+          -1,
+          1,
+          1
+        ],
+        [
+          1,
+          -1,
+          4
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          5
+        ]
+      ],
+      "q": -1,
+      "r": 0,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          0,
+          -1,
+          2
+        ],
+        [
+          1,
+          -2,
+          3
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          2,
+          -2,
+          4
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          2,
+          -1,
+          5
+        ]
+      ],
+      "q": 0,
+      "r": -1,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          1,
+          -2,
+          1
+        ],
+        [
+          2,
+          -2,
+          0
+        ]
+      ],
+      "q": 1,
+      "r": -2,
+      "corner_index": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          1,
+          -2,
+          2
+        ],
+        [
+          1,
+          -1,
+          1
+        ],
+        [
+          2,
+          -1,
+          0
+        ]
+      ],
+      "q": 1,
+      "r": -2,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          2,
+          2
+        ],
+        [
+          -1,
+          1,
+          3
+        ],
+        [
+          0,
+          1,
+          4
+        ],
+        [
+          0,
+          2,
+          5
+        ]
+      ],
+      "q": -2,
+      "r": 2,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          2,
+          3
+        ],
+        [
+          -1,
+          2,
+          4
+        ]
+      ],
+      "q": -2,
+      "r": 2,
+      "corner_index": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -2,
+          2,
+          4
+        ]
+      ],
+      "q": -2,
+      "r": 2,
+      "corner_index": 4,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -1,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          3
+        ],
+        [
+          -1,
+          2,
+          1
+        ],
+        [
+          1,
+          0,
+          4
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          1,
+          1,
+          5
+        ]
+      ],
+      "q": -1,
+      "r": 1,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          1,
+          -1,
+          3
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          2,
+          -1,
+          4
+        ],
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          2,
+          0,
+          5
+        ]
+      ],
+      "q": 0,
+      "r": 0,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          1,
+          -1,
+          2
+        ],
+        [
+          2,
+          -2,
+          3
+        ],
+        [
+          1,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          0
+        ]
+      ],
+      "q": 1,
+      "r": -1,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          2,
+          -2,
+          1
+        ]
+      ],
+      "q": 2,
+      "r": -2,
+      "corner_index": 1,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          2,
+          -2,
+          2
+        ],
+        [
+          2,
+          -1,
+          1
+        ]
+      ],
+      "q": 2,
+      "r": -2,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -1,
+          2,
+          2
+        ],
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          1,
+          1,
+          4
+        ]
+      ],
+      "q": -1,
+      "r": 2,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          -1,
+          2,
+          3
+        ],
+        [
+          0,
+          2,
+          4
+        ]
+      ],
+      "q": -1,
+      "r": 2,
+      "corner_index": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          1,
+          0,
+          3
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          2,
+          0,
+          4
+        ]
+      ],
+      "q": 0,
+      "r": 1,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          2,
+          -1,
+          3
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "q": 1,
+      "r": 0,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          2,
+          -1,
+          2
+        ],
+        [
+          2,
+          0,
+          1
+        ]
+      ],
+      "q": 2,
+      "r": -1,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          1,
+          1,
+          3
+        ]
+      ],
+      "q": 0,
+      "r": 2,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          0,
+          2,
+          3
+        ]
+      ],
+      "q": 0,
+      "r": 2,
+      "corner_index": 3,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          1,
+          1,
+          2
+        ],
+        [
+          2,
+          0,
+          3
+        ]
+      ],
+      "q": 1,
+      "r": 1,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    },
+    {
+      "corners": [
+        [
+          2,
+          0,
+          2
+        ]
+      ],
+      "q": 2,
+      "r": 0,
+      "corner_index": 2,
+      "owner": null,
+      "building": null
+    }
+  ],
+  "edges": [
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 0
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 1
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 3
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 4
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 4
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 5
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 5
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 0
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 0
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 1
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 4
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 4
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 0
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 0
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 0
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -2,
+        "corner": 0
+      },
+      "v2": {
+        "q": 0,
+        "r": -2,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -2,
+        "corner": 1
+      },
+      "v2": {
+        "q": 0,
+        "r": -2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 1
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 0
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 0
+      },
+      "v2": {
+        "q": 0,
+        "r": -2,
+        "corner": 0
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 1,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 1,
+        "corner": 3
+      },
+      "v2": {
+        "q": -2,
+        "r": 1,
+        "corner": 4
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 1,
+        "corner": 4
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 4
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 4
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 4
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 3
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 4
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 4
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 1
+      },
+      "v2": {
+        "q": 0,
+        "r": -2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 0,
+        "corner": 1
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -2,
+        "corner": 1
+      },
+      "v2": {
+        "q": 1,
+        "r": -2,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -2,
+        "corner": 1
+      },
+      "v2": {
+        "q": 1,
+        "r": -2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": -1,
+        "corner": 1
+      },
+      "v2": {
+        "q": 0,
+        "r": -2,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 2,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 2,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 2,
+        "corner": 3
+      },
+      "v2": {
+        "q": -2,
+        "r": 2,
+        "corner": 4
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 2,
+        "corner": 4
+      },
+      "v2": {
+        "q": -2,
+        "r": 1,
+        "corner": 4
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 1,
+        "corner": 4
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 2,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 1,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 1,
+        "corner": 3
+      },
+      "v2": {
+        "q": -2,
+        "r": 0,
+        "corner": 3
+      },
+      "owner": 1,
+      "has_road": true
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 1,
+        "r": -2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 1,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -2,
+        "corner": 1
+      },
+      "v2": {
+        "q": 2,
+        "r": -2,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 2,
+        "r": -2,
+        "corner": 1
+      },
+      "v2": {
+        "q": 2,
+        "r": -2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 2,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 1,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 1,
+        "r": -2,
+        "corner": 1
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 2,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 2,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 2,
+        "corner": 3
+      },
+      "v2": {
+        "q": -2,
+        "r": 2,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -2,
+        "r": 2,
+        "corner": 3
+      },
+      "v2": {
+        "q": -2,
+        "r": 1,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 2,
+        "corner": 2
+      },
+      "v2": {
+        "q": -2,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 1,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 2,
+        "r": -2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 2,
+        "r": -2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 2,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 2,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 1,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 2,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 2,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 2,
+        "corner": 3
+      },
+      "v2": {
+        "q": -1,
+        "r": 2,
+        "corner": 3
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": -1,
+        "r": 2,
+        "corner": 3
+      },
+      "v2": {
+        "q": -2,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": 1,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 0,
+        "r": 2,
+        "corner": 2
+      },
+      "v2": {
+        "q": -1,
+        "r": 2,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 2,
+        "r": -1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 2,
+        "r": -1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 2,
+        "r": 0,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 2,
+        "r": 0,
+        "corner": 2
+      },
+      "v2": {
+        "q": 1,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    },
+    {
+      "v1": {
+        "q": 1,
+        "r": 1,
+        "corner": 2
+      },
+      "v2": {
+        "q": 0,
+        "r": 1,
+        "corner": 2
+      },
+      "owner": null,
+      "has_road": false
+    }
+  ]
+}
