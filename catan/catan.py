@@ -1,7 +1,70 @@
 import time
 import random
 import tkinter as tk
-from math import cos, sin, pi
+import math
+from math import cos, sin, pi, sqrt
+
+
+class HexMap:
+    def __init__(self, radius):
+        self.radius = radius
+        self.hex_size = 1.0  # Using unit size for calculations
+        # Calculate ALL vertex positions first
+        self.vertex_positions = self._calculate_all_vertex_positions()
+        # Then define hexes based on vertex positions
+        self.hexes = self._create_hexes()
+        
+    def _calculate_all_vertex_positions(self):
+        """Calculate the visual coordinates for all vertices in the map"""
+        positions = {}
+        # Calculate for a rectangular area that covers our hex map
+        for q in range(-self.radius*2, self.radius*2 + 1):
+            for r in range(-self.radius*2, self.radius*2 + 1):
+                # Calculate the 6 vertices for each potential hex position
+                for vertex_num in range(6):
+                    vertex_pos = self._get_vertex_position(q, r, vertex_num)
+                    # Round to avoid floating point issues
+                    vertex_pos = (round(vertex_pos[0], 6), round(vertex_pos[1], 6))
+                    positions[vertex_pos] = vertex_pos
+        return positions
+
+    def _create_hexes(self):
+        """Create hex tiles based on the vertex positions"""
+        hexes = {}
+        for q in range(-self.radius, self.radius + 1):
+            for r in range(-self.radius, self.radius + 1):
+                if self._is_in_map(q, r):
+                    # Get the 6 vertices for this hex from our pre-calculated positions
+                    vertices = []
+                    for vertex_num in range(6):
+                        pos = self._get_vertex_position(q, r, vertex_num)
+                        pos = (round(pos[0], 6), round(pos[1], 6))
+                        vertices.append(pos)
+                    hexes[(q, r)] = HexTile(resource_type=None, number_token=0, q=q, r=r)
+                    hexes[(q, r)].vertices = vertices
+        return hexes
+
+    def _get_vertex_position(self, q, r, vertex_num):
+        """Calculate the visual position of a vertex"""
+        # Use the existing hex_to_pixel conversion
+        center = self._hex_to_pixel(q, r)
+        angle = math.pi / 3 * vertex_num
+        return (
+            center[0] + self.hex_size * math.cos(angle),
+            center[1] + self.hex_size * math.sin(angle)
+        )
+
+    def _hex_to_pixel(self, q, r):
+        """Convert hex coordinates to pixel coordinates"""
+        x = self.hex_size * (3/2 * q)
+        y = self.hex_size * (sqrt(3)/2 * q + sqrt(3) * r)
+        return (x, y)
+
+    def _is_in_map(self, q, r):
+        """Check if hex coordinates are within the valid map radius"""
+        # Using axial coordinate system, check if point is within radius
+        # This creates a hexagonal shaped map
+        return abs(q) <= self.radius and abs(r) <= self.radius and abs(-q-r) <= self.radius
 
 def corner_pixel_coords(q, r, corner_index, 
                        tile_size=1.0, 
@@ -47,8 +110,8 @@ class HexTile:
         self.r = r  # r coordinate in axial system
 
 class Vertex:
-    def __init__(self, q, r, vertex_position, pixel_x=0, pixel_y=0):
-        # Axial coords for reference (you can keep them or remove them)
+    def __init__(self, vertex_position, pixel_x=0, pixel_y=0, q=None, r=None):
+        # Axial coords for reference (optional now)
         self.q = q
         self.r = r
         self.vertex_position = vertex_position
@@ -91,10 +154,12 @@ class Player:
 
 class Board:
     def __init__(self):
+        # Create hex map first
+        self.hex_map = HexMap(2)  # radius of 2 gives us the standard Catan board size
+        # Then create the game elements
         self.tiles = []
-        # Key change: self.vertices is now keyed by (pixel_x, pixel_y)
-        self.vertices = {}
-        # The “bank” has limited resource cards, e.g. 19 each for basic 5 resources
+        self.vertices = {}  # Will be keyed by vertex position tuples
+        # The "bank" has limited resource cards, e.g. 19 each for basic 5 resources
         self.bank = {
             'wood': 19,
             'brick': 19,
@@ -169,41 +234,46 @@ class Board:
                             tile2.adjacent_tiles.append(tile1)
 
     def create_vertices(self):
-        """
-        Create or retrieve a single Vertex object for each of the 6 corners on each tile. 
-        Then link corners around each tile so connected_vertices is populated.
-        """
+        """Create vertices and establish their connections"""
+        # First create all vertices for each tile using the hex_map
         for tile in self.tiles:
-            corner_vertices = []
-            # 6 corners
-            for i in range(6):
-                px, py = corner_pixel_coords(tile.q, tile.r, i, tile_size=1.0)
+            # Get the tile's coordinates
+            q, r = tile.q, tile.r
+            # Get the 6 vertices for this hex from our pre-calculated positions
+            vertices = []
+            for vertex_num in range(6):
+                pos = self.hex_map._get_vertex_position(q, r, vertex_num)
+                pos = (round(pos[0], 6), round(pos[1], 6))
                 
-                # Use (px, py) as the dictionary key
-                if (px, py) not in self.vertices:
-                    # Create the vertex (store q, r, i for reference only if desired)
-                    self.vertices[(px, py)] = Vertex(
-                        q=tile.q,
-                        r=tile.r,
-                        vertex_position=i,
-                        pixel_x=px,
-                        pixel_y=py
+                # Create vertex if it doesn't exist
+                if pos not in self.vertices:
+                    self.vertices[pos] = Vertex(
+                        vertex_position=pos,
+                        pixel_x=pos[0],
+                        pixel_y=pos[1]
                     )
-
-                vertex = self.vertices[(px, py)]
-                # Connect tile <-> vertex
+                vertices.append(pos)
+            tile.vertices = vertices
+        
+        # Then connect vertices to tiles and to each other
+        for tile in self.tiles:
+            # Connect vertices to this tile
+            for vertex_pos in tile.vertices:
+                vertex = self.vertices[vertex_pos]
                 if tile not in vertex.connected_tiles:
                     vertex.connected_tiles.append(tile)
-                if vertex not in tile.vertices:
-                    tile.vertices.append(vertex)
-
-                corner_vertices.append(vertex)
-
-            # Now link adjacent corners around this tile 
-            # so that vertex.connected_vertices is populated
+        
+        # Connect vertices to each other
+        for tile in self.tiles:
             for i in range(6):
-                v1 = corner_vertices[i]
-                v2 = corner_vertices[(i + 1) % 6]
+                # Get current and next vertex positions (wrapping around to 0)
+                v1_pos = tile.vertices[i]
+                v2_pos = tile.vertices[(i + 1) % 6]
+                
+                v1 = self.vertices[v1_pos]
+                v2 = self.vertices[v2_pos]
+                
+                # Connect vertices if not already connected
                 if v2 not in v1.connected_vertices:
                     v1.connected_vertices.append(v2)
                 if v1 not in v2.connected_vertices:
@@ -632,32 +702,10 @@ class CatanGUI:
                               fill=color, width=3)
 
     def get_vertex_pixels(self, vertex):
-        """
-        Scale the normalized vertex coordinates to match the hex size and center them on screen.
-        """
-        horizontal_spacing = 1.732 * self.hex_size  # sqrt(3)
-        vertical_spacing = 1.5 * self.hex_size
-        
-        # Apply the same row-specific offsets as the hexes
-        row_offset = 0
-        r = vertex.r
-        if r == 0:
-            row_offset = horizontal_spacing
-        elif r == 1:
-            row_offset = horizontal_spacing * 0.5
-        elif r == 3:
-            row_offset = horizontal_spacing * 0.5
-        elif r == 4:
-            row_offset = horizontal_spacing
-        
-        # Scale and offset the coordinates
-        scaled_x = (vertex.pixel_x * horizontal_spacing) + row_offset
-        scaled_y = vertex.pixel_y * vertical_spacing
-        
-        # Center on screen and adjust for board offset
-        screen_x = self.center_x + scaled_x - (2 * horizontal_spacing)  # Subtract 2 tiles worth to match board centering
-        screen_y = self.center_y + scaled_y - (2 * vertical_spacing)   # Subtract 2 tiles worth to match board centering
-        
+        """Convert vertex coordinates to screen coordinates"""
+        # Scale the coordinates to match our display size
+        screen_x = self.center_x + vertex.pixel_x * self.hex_size
+        screen_y = self.center_y + vertex.pixel_y * self.hex_size
         return screen_x, screen_y
 
     def draw_board(self):
@@ -689,7 +737,8 @@ class CatanGUI:
         
         # Draw settlements and roads
         for tile in self.board.tiles:
-            for vertex in tile.vertices:
+            for vertex_pos in tile.vertices:
+                vertex = self.board.vertices[vertex_pos]  # Get the actual Vertex object
                 if vertex.building:
                     x, y = self.get_vertex_pixels(vertex)
                     self.draw_settlement(x, y, vertex.owner)
@@ -734,36 +783,47 @@ def calculate_pip_value(vertex):
     raw_pips = sum(pip_values.get(tile.number_token, 0) for tile in valid_tiles)
     return (raw_pips, num_tiles)
 
+def auto_place_settlement(board, player):
+    valid_spots = board.get_valid_settlement_spots(player)
+    assert valid_spots, 'Starting go always has valid spots'
+
+    spot_values = [(spot, calculate_pip_value(spot)) for spot in valid_spots]
+    spot_values.sort(key=lambda x: (x[1][0], x[1][1]), reverse=True)
+
+  
+    print(f"\nPlayer {player.pid} top spot:")
+    spot, (pip_value, num_tiles) = spot_values[0]
+    adjacent_resources = [t.resource_type for t in spot.connected_tiles]
+    print(f"Spot at ({spot.q},{spot.r}) pos {spot.vertex_position}: "
+            f"{pip_value:.1f} pips, {num_tiles} tiles")
+    print(f"  Adjacent resources: {adjacent_resources}")
+
+    
+    # Place at best spot
+    best_spot = spot_values[0][0]
+    best_spot.owner = player.pid
+    best_spot.building = 'settlement'
+    player.settlements += 1
+    print(f'settlement for {player.pid} placed at {best_spot.vertex_position}')
+    
+    # Place road from settlement
+    if best_spot.connected_vertices:
+        road_end = random.choice(best_spot.connected_vertices)
+        new_road = Road(best_spot, road_end, owner=player.pid)
+        player.roads.append(new_road)
+    return adjacent_resources
+
 def auto_place_initial_settlements(board):
     """Auto-place initial settlements and roads for testing purposes."""
     for player in board.players:  # Currently just first player
-        valid_spots = board.get_valid_settlement_spots(player)
-        
-        if valid_spots:
-            # Calculate values and sort by both pip value and number of tiles
-            spot_values = [(spot, calculate_pip_value(spot)) for spot in valid_spots]
-            spot_values.sort(key=lambda x: (x[1][0], x[1][1]), reverse=True)
+        auto_place_settlement(board, player)
 
-            # Print top 3 spots for verification
-            print(f"\nPlayer {player.pid} top spots:")
-            for spot, (pip_value, num_tiles) in spot_values[:1]:
-                print(f"Spot at ({spot.q},{spot.r}) pos {spot.vertex_position}: "
-                      f"{pip_value:.1f} pips, {num_tiles} tiles")
-                print(f"  Adjacent resources: {[t.resource_type for t in spot.connected_tiles]}")
-                # print(f"  Adjacent numbers: {[t.number_token for t in spot.connected_tiles]}")
-            
-            # Place at best spot
-            best_spot = spot_values[0][0]
-            best_spot.owner = player.pid
-            best_spot.building = 'settlement'
-            player.settlements += 1
-            print(f'settlement for {player.pid} placed at {best_spot.vertex_position}')
-            
-            # Place road from settlement
-            if best_spot.connected_vertices:
-                road_end = random.choice(best_spot.connected_vertices)
-                new_road = Road(best_spot, road_end, owner=player.pid)
-                player.roads.append(new_road)
+    for player in board.players[::-1]:
+        adjacent_resources = auto_place_settlement(board, player)
+        print(f"Player {player.pid} adjacent resources: {adjacent_resources} (collecting from second settlement)")
+
+     
+
 
 # ------------------------------------------------------------------------------
 # Example usage / flow
@@ -772,5 +832,7 @@ if __name__ == "__main__":
     board = Board()
     auto_place_initial_settlements(board)
     gui = CatanGUI(board)
+    #delete after 10 seconds
+    gui.root.after(10000, gui.root.destroy)
     gui.root.mainloop()
     print('finished.')
