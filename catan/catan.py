@@ -23,20 +23,18 @@ class Vertex:
     Revised Vertex class that can represent multiple (q, r, corner_index)
     references (corners) for the same physical spot.
     """
-    def __init__(self):
-        # Each element is a tuple (q, r, corner_index)
-        self.corners = []
-        # We keep existing fields so that the rest of the code (e.g. ownership) doesn’t break:
+    def __init__(self, q, r, corner_index):
+        # Start corners as a list containing the first corner
+        self.corners = [(q, r, corner_index)]
+
+        self.q = q
+        self.r = r
+        self.corner_index = corner_index
+
         self.connected_tiles = []
         self.connected_vertices = []
         self.owner = None
         self.building = None
-
-    def add_corner_representation(self, q, r, corner_index):
-        """Add a corner representation if it's not already present."""
-        corner_tuple = (q, r, corner_index)
-        if corner_tuple not in self.corners:
-            self.corners.append(corner_tuple)
 
     def __repr__(self):
         return f"Vertex(corners={self.corners}, owner={self.owner}, building={self.building})"
@@ -71,7 +69,7 @@ class Board:
         self.tiles = []
         # We will store each physical vertex in a dictionary keyed by
         # a consistent corner-key so we don’t create duplicates.
-        self.vertices = {}
+        self.vertices = []
         self.edges = {}
         self.bank = {
             'wood': 19,
@@ -91,9 +89,11 @@ class Board:
         """Setup board in distinct phases"""
         self.setup_resources()         # 1) Create tiles with resources
         self.connect_adjacent_tiles()  # 2) Connect neighboring tiles
-        self.create_vertices()         # 3) Create vertices (with corner reps)
-        self.create_edges()            # 4) Create edges between vertices
-        self.assign_valid_number_tokens()  # 5) Assign dice numbers
+        self.assign_valid_number_tokens()  # 3) Assign dice numbers
+        
+        self.create_vertices()         # 4) Create vertices (with corner reps)
+        # self.create_edges()            # 5) Create edges between vertices
+
 
     def setup_resources(self):
         """Phase 1: Setup resources only"""
@@ -141,28 +141,43 @@ class Board:
                         if tile1 not in tile2.adjacent_tiles:
                             tile2.adjacent_tiles.append(tile1)
 
-    def _get_vertex_key(self, q, r, corner_index):
-        """
-        Return a consistent key (tuple) for the 'physical location' of a corner.
-        
-        A simple approach: define offsets for each corner, add them to (q, r),
-        and use that offset location as the unique key.
-        """
-        # Axial corner offsets around a hex (q, r):
-        # (these are approximate or logical placeholders—for full accuracy,
-        #  you may want to convert to cube coordinates or actual 2D geometry)
-        corner_offsets = [
-            (0, -1),  # corner 0
-            (1, -1),  # corner 1
-            (1, 0),   # corner 2
-            (0, 1),   # corner 3
-            (-1, 1),  # corner 4
-            (-1, 0)   # corner 5
-        ]
-        offset_q, offset_r = corner_offsets[corner_index]
-        corner_q = q + offset_q
-        corner_r = r + offset_r
-        return (corner_q, corner_r)
+    def equivalent_vertex(self, tuple1, tuple2):
+        """Input two (q, r, corner_index) tuples and return True if they are equivalent."""
+        if tuple1 == tuple2:
+            return True
+      
+        q1, r1, c1 = tuple1
+        q2, r2, c2 = tuple2
+
+        #    0
+        # 5     1
+        # 4     2
+        #    3
+
+        # if c1 == 1:
+        #     return False
+
+        # diff to go from tuple1 to tuple2
+        diff = (q2 - q1, r2 - r1)
+        if diff == (-1, 0): # top left
+            if (c1 == 0 and c2 == 2) or (c1 == 5 and c2 == 3):
+                return True
+        elif diff == (0, -1): # top right
+            if (c1 == 0 and c2 == 4) or (c1 == 1 and c2 == 3):
+                return True
+        elif diff == (1, -1): # right
+            if (c1 == 1 and c2 == 5) or (c1 == 2 and c2 == 4):
+                return True
+        elif diff == (1, 0): # bottom right
+            if (c1 == 2 and c2 == 0) or (c1 == 3 and c2 == 5):
+                return True
+        elif diff == (0, 1): # bottom left
+            if (c1 == 3 and c2 == 1) or (c1 == 4 and c2 == 0):
+                return True
+        elif diff == (-1, 1): # left
+            if (c1 == 4 and c2 == 2) or (c1 == 5 and c2 == 1):
+                return True
+        return False
 
     def create_vertices(self):
         """
@@ -171,37 +186,32 @@ class Board:
         3) Otherwise reuse the existing Vertex.
         4) Add this corner representation (q, r, corner_index) to the vertex.
         5) Link tile <-> vertex if needed.
-           0
-        5     1
-        4     2
-           3
         """
-        self.vertices = {}  # reset any existing dictionary
-
+        self.vertices = []  # reset any existing list
         for tile in self.tiles:
+            # Make sure tile.vertices starts empty so we can populate it fresh
+            tile.vertices = []
+
             q, r = tile.q, tile.r
             for corner_index in range(6):
-                corner_key = self._get_vertex_key(q, r, corner_index)
+                matching_vertex = None
+                for v in self.vertices:
+                    if self.equivalent_vertex((q, r, corner_index), (v.q, v.r, v.corner_index)):
+                        matching_vertex = v
+                        break
 
-                # If not found, create a new Vertex
-                if corner_key not in self.vertices:
-                    new_v = Vertex()
-                    new_v.add_corner_representation(q, r, corner_index)
-                    self.vertices[corner_key] = new_v
+                if not matching_vertex:
+                    new_v = Vertex(q, r, corner_index)
+                    self.vertices.append(new_v)
+                    # Attach tile <--> vertex
+                    tile.vertices.append(new_v)
+                    new_v.connected_tiles.append(tile)
                 else:
-                    # Reuse existing vertex
-                    existing_v = self.vertices[corner_key]
-                    existing_v.add_corner_representation(q, r, corner_index)
-
-                # Link back and forth if you need tile -> vertex references:
-                the_vertex = self.vertices[corner_key]
-                if tile not in the_vertex.connected_tiles:
-                    the_vertex.connected_tiles.append(tile)
-                if the_vertex not in tile.vertices:
-                    tile.vertices.append(the_vertex)
-
-        # Optionally, you can build adjacency among vertices here or in create_edges.
-        # We'll do it in create_edges for clarity.
+                    # Add this (q, r, corner_index) to the matching vertex's corners
+                    matching_vertex.corners.append((q, r, corner_index))
+                    # Attach tile <--> matching vertex
+                    tile.vertices.append(matching_vertex)
+                    matching_vertex.connected_tiles.append(tile)
 
     def create_edges(self):
         """
@@ -323,12 +333,6 @@ class Board:
         self.current_player_index = (self.current_player_index - 1) % len(self.players)
         return self.players[self.current_player_index]
 
-    def _collect_all_vertices(self):
-        """
-        Return a list of unique Vertex objects.
-        (We store them in self.vertices, so just return the dict's values.)
-        """
-        return list(self.vertices.values())
 
     def get_valid_settlement_spots(self, player):
         """
@@ -339,9 +343,7 @@ class Board:
          - Must be connected to at least one tile (not off-board)
         """
         valid_spots = []
-        all_vertices = self._collect_all_vertices()
-
-        for v in all_vertices:
+        for v in self.vertices:
             if (v.owner is None
                 and not self._has_nearby_settlement(v)
                 and len(v.connected_tiles) > 0):
@@ -366,8 +368,7 @@ class Board:
         which can be upgraded to a city.
         """
         valid_spots = []
-        all_vertices = self._collect_all_vertices()
-        for v in all_vertices:
+        for v in self.vertices:
             if v.owner == player.pid and v.building == 'settlement':
                 valid_spots.append(v)
         return valid_spots
@@ -454,19 +455,11 @@ class Board:
             "current_player": self.get_current_player().pid
         }
 
-        # Serialize vertices
-        # For debugging, pick the first corner as "q, r, corner" or show them all
         vertex_list = []
-        for v in self._collect_all_vertices():
-            # Just to keep the existing references:
-            # If corners are present, pick the first one to show q,r,corner
-            if v.corners:
-                q0, r0, c0 = v.corners[0]
-            else:
-                q0, r0, c0 = (None, None, None)
+        for v in self.vertices:
+            q0, r0, c0 = v.q, v.r, v.corner_index
 
             vertex_list.append({
-                "corners": v.corners,
                 "q": q0,
                 "r": r0,
                 "corner_index": c0,
@@ -531,11 +524,7 @@ def auto_place_settlement(board, player):
         return None
 
     spot = random.choice(valid_spots)
-    print(f"auto_place_settlement: spot: {spot}")
-    # For debugging, pick the first corner
-    if spot.corners:
-        q0, r0, c0 = spot.corners[0]
-        print(f"Spot at ({q0},{r0}) corner {c0}: connected to {len(spot.connected_tiles)} tiles")
+    print(f"auto_place_settlement: spot: {spot} | connected_tiles: {len(spot.connected_tiles)}")
 
     spot.owner = player.pid
     spot.building = 'settlement'
@@ -558,9 +547,26 @@ def auto_place_settlement(board, player):
 def auto_place_initial_settlements(board):
     print("-" * 30 + " auto_place_initial_settlements " + "-" * 30)
     print(f'len(board.edges): {len(board.edges)}')
+    print(f'len(board.vertices): {len(board.vertices)}')
 
-    for player in board.players[:1]:
-        auto_place_settlement(board, player)
+    player = board.players[0]
+    for v in board.vertices:
+        v.owner = player.pid
+        v.building = 'settlement'
+
+  
+    # player = board.players[3]
+    # for edge in board.edges.values():
+    #     edge.owner = player.pid
+    #     road = Road(edge, player.pid)
+    #     player.roads.append(road)
+
+    print(f'placed {len(board.vertices)} settlements')
+    print(f'placed {len(board.edges)} roads')
+
+
+    # for player in board.players[:1]:
+    #     auto_place_settlement(board, player)
 
     # Example of second round if desired:
     # board.setup_round = 2
