@@ -124,8 +124,9 @@ class Board:
         self.hex_cells = {}
         self.vertex_cells = {}
         self.bank = Bank()
-        self.players = {id : Player(id) for id in range(1, 5)}
-        self.current_player = 1
+        # Convert player IDs to strings
+        self.players = {str(id): Player(str(id)) for id in range(1, 5)}
+        self.current_player = '1'
 
     def get_board_state(self, get_next_actions=True):
         roads = []
@@ -145,7 +146,7 @@ class Board:
             'hexes': [{
                 'q': hex_cell.q,
                 'r': hex_cell.r,
-                'resource_type': hex_cell.resource_type.value,
+                'resource_type': hex_cell.resource_type.name,
                 'resource_number': hex_cell.resource_number,
                 'robber': hex_cell.robber
             } for hex_cell in self.hex_cells.values()],
@@ -173,7 +174,7 @@ ResourceType = Enum('ResourceType', ['wood', 'brick', 'wheat', 'sheep', 'ore', '
     
 class Player:
     def __init__(self, pid):
-        self.pid = pid # 1-4
+        self.pid = pid  # Now a string "1"-"4"
         self.resources = {
             ResourceType.wood: 0,
             ResourceType.brick: 0,
@@ -354,10 +355,11 @@ class BoardUtils:
         return vertex_pips[0][1]
     
     @staticmethod
-    def collect_resources(board, dice_roll, current_player_id=3):
-        player_order = [] # Wraps e.g. [3, 4, 1, 2]
+    def collect_resources(board, dice_roll, current_player_id="3"):
+        player_order = []  # Wraps e.g. ["3", "4", "1", "2"]
+        current = int(current_player_id)
         for i in range(4):  # 4 players total
-            player_id = ((current_player_id - 1 + i) % 4) + 1  # Convert to 1-based indexing
+            player_id = str(((current - 1 + i) % 4) + 1)
             player_order.append(player_id)
 
         for player_id in player_order:
@@ -470,9 +472,16 @@ class EndpointHelpers:
         }
 
     @staticmethod
-    def handle_place_road(board, start_vertex, end_vertex, player_id):
+    def handle_place_road(board, raw_start_vertex, raw_end_vertex, player_id):
         """Handle road placement logic"""
-        print(f'handle_place_road called with start_vertex: {start_vertex}, end_vertex: {end_vertex}, and player_id: {player_id}')
+
+
+        print(f'handle_place_road called with start_vertex: {raw_start_vertex}, end_vertex: {raw_end_vertex}, and player_id: {player_id}')
+        start_vertex = min(raw_start_vertex, raw_end_vertex)
+        end_vertex = max(raw_start_vertex, raw_end_vertex)
+        print(f'start_vertex: {start_vertex}, end_vertex: {end_vertex}')
+        
+        
         possible_actions = BoardUtils.possible_next_actions(board, player_id)
         if 'roads' not in possible_actions or (start_vertex, end_vertex) not in possible_actions['roads']:
             raise ValueError('Invalid road placement')
@@ -491,7 +500,9 @@ class EndpointHelpers:
     @staticmethod
     def handle_end_turn(board):
         """Handle end turn logic"""
-        new_player = (board.current_player % 4) + 1
+        # Convert to int for calculation, then back to string
+        current = int(board.current_player)
+        new_player = str((current % 4) + 1)
         print(f'handle_end_turn called, old player: {board.current_player}, new player: {new_player}')
         board.current_player = new_player
         return board
@@ -542,33 +553,32 @@ class ExampleBoards:
         ## Testing road length and settlment placement for road cut off
         # Player 1
         vertex_cell = board.vertex_cells[32]
-        vertex_cell.owner_id = 1
+        vertex_cell.owner_id = "1"
         vertex_cell.building = BuildingType.settlement
-        vertex_cell.roads[38] = 1
-        board.vertex_cells[38].roads[32] = 1
+        vertex_cell.roads[38] = "1"
+        board.vertex_cells[38].roads[32] = "1"
 
-        board.vertex_cells[38].roads[37] = 1
-        board.vertex_cells[37].roads[38] = 1
+        board.vertex_cells[38].roads[37] = "1"
+        board.vertex_cells[37].roads[38] = "1"
 
-        board.vertex_cells[38].roads[44] = 1
-        board.vertex_cells[44].roads[38] = 1
+        board.vertex_cells[38].roads[44] = "1"
+        board.vertex_cells[44].roads[38] = "1"
 
         vertex_cell = board.vertex_cells[37]
-        vertex_cell.owner_id = 1
+        vertex_cell.owner_id = "1"
         vertex_cell.building = BuildingType.settlement
         #Player 2
         vertex_cell = board.vertex_cells[25]
-        vertex_cell.owner_id = 2
+        vertex_cell.owner_id = "2"
         vertex_cell.building = BuildingType.settlement
         for start, end in pairwise([25, 31, 37, 43]):
-            board.vertex_cells[start].roads[end] = 2
-            board.vertex_cells[end].roads[start] = 2
+            board.vertex_cells[start].roads[end] = "2"
+            board.vertex_cells[end].roads[start] = "2"
         return board
 
     @staticmethod
     def example_highest_production_first_spots():
-        board = BoardUtils.setup_board()
-        for owner_id in range(1, 5):
+        def place_spot_for_owner_id(board, owner_id):
             vertex_id = BoardUtils.highest_production_spot(board)
             vertex_cell = board.vertex_cells[vertex_id]
             vertex_cell.owner_id = owner_id
@@ -580,8 +590,16 @@ class ExampleBoards:
                 resource_type = board.hex_cells[hex_id].resource_type
                 if resource_type == ResourceType.desert:
                     continue
-                board.players[owner_id-1].resources[resource_type] += 1
+                board.players[owner_id].resources[resource_type] += 1
                 board.bank.resources[resource_type] -= 1
+            return board
+
+        board = BoardUtils.setup_board()
+        for owner_id in range(1, 5):
+            board = place_spot_for_owner_id(board, str(owner_id))
+
+        for owner_id in range(4, 0, -1):
+            board = place_spot_for_owner_id(board, str(owner_id))
         return board
 
 
@@ -618,25 +636,11 @@ Allow the frontend to take the actions specificed in possible_next_actions, upda
 
 
 if __name__ == "__main__":
-    # board = BoardUtils.setup_board()
-    board = ExampleBoards.example_settlement_cutoff_board()
+    import pickle
+    with open('games/game_state1.pkl', 'rb') as f:
+        board = pickle.load(f)
 
-    dice1, dice2 = random.randint(1, 6), random.randint(1, 6)
-    BoardUtils.collect_resources(board, dice1 + dice2)
-    print_resources(board)
-
-    for player_id in [1, 2]:
-        next_actions = BoardUtils.possible_next_actions(board, player_id)
-        print(next_actions)
-        for start, end in next_actions['roads']:
-            board.vertex_cells[start].roads[end] = player_id
-            board.vertex_cells[end].roads[start] = player_id
-
-    board_state = board.get_board_state()
-    with open('board.json', 'w') as f:
-        json.dump(board_state, f, indent=2)
-
-    visualization_catan_board(board_state)
+    visualization_catan_board(board.get_board_state())
 
 # python -m http.server
 # http://localhost:8000/catan_board.html

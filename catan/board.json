@@ -4,134 +4,134 @@
     {
       "q": -4,
       "r": 2,
-      "resource_type": 1,
-      "resource_number": 11,
-      "robber": false
-    },
-    {
-      "q": -3,
-      "r": 0,
-      "resource_type": 1,
+      "resource_type": "wheat",
       "resource_number": 10,
       "robber": false
     },
     {
       "q": -3,
+      "r": 0,
+      "resource_type": "wheat",
+      "resource_number": 4,
+      "robber": false
+    },
+    {
+      "q": -3,
       "r": 3,
-      "resource_type": 4,
-      "resource_number": 8,
+      "resource_type": "wood",
+      "resource_number": 11,
       "robber": false
     },
     {
       "q": -2,
       "r": -2,
-      "resource_type": 1,
-      "resource_number": 9,
+      "resource_type": "brick",
+      "resource_number": 4,
       "robber": false
     },
     {
       "q": -2,
       "r": 1,
-      "resource_type": 3,
-      "resource_number": 2,
+      "resource_type": "wheat",
+      "resource_number": 6,
       "robber": false
     },
     {
       "q": -2,
       "r": 4,
-      "resource_type": 4,
-      "resource_number": 9,
+      "resource_type": "brick",
+      "resource_number": 6,
       "robber": false
     },
     {
       "q": -1,
       "r": -1,
-      "resource_type": 2,
+      "resource_type": "wood",
       "resource_number": 3,
       "robber": false
     },
     {
       "q": -1,
       "r": 2,
-      "resource_type": 3,
-      "resource_number": 4,
-      "robber": false
-    },
-    {
-      "q": 0,
-      "r": -3,
-      "resource_type": 5,
+      "resource_type": "ore",
       "resource_number": 5,
       "robber": false
     },
     {
       "q": 0,
-      "r": 0,
-      "resource_type": 2,
+      "r": -3,
+      "resource_type": "wheat",
       "resource_number": 12,
       "robber": false
     },
     {
       "q": 0,
+      "r": 0,
+      "resource_type": "wood",
+      "resource_number": 3,
+      "robber": false
+    },
+    {
+      "q": 0,
       "r": 3,
-      "resource_type": 6,
+      "resource_type": "desert",
       "resource_number": -1,
       "robber": true
     },
     {
       "q": 1,
       "r": -2,
-      "resource_type": 4,
-      "resource_number": 6,
+      "resource_type": "brick",
+      "resource_number": 9,
       "robber": false
     },
     {
       "q": 1,
       "r": 1,
-      "resource_type": 5,
-      "resource_number": 6,
+      "resource_type": "sheep",
+      "resource_number": 9,
       "robber": false
     },
     {
       "q": 2,
       "r": -4,
-      "resource_type": 2,
-      "resource_number": 4,
-      "robber": false
-    },
-    {
-      "q": 2,
-      "r": -1,
-      "resource_type": 1,
+      "resource_type": "ore",
       "resource_number": 11,
       "robber": false
     },
     {
       "q": 2,
+      "r": -1,
+      "resource_type": "sheep",
+      "resource_number": 2,
+      "robber": false
+    },
+    {
+      "q": 2,
       "r": 2,
-      "resource_type": 3,
-      "resource_number": 10,
+      "resource_type": "sheep",
+      "resource_number": 8,
       "robber": false
     },
     {
       "q": 3,
       "r": -3,
-      "resource_type": 3,
-      "resource_number": 3,
+      "resource_type": "ore",
+      "resource_number": 8,
       "robber": false
     },
     {
       "q": 3,
       "r": 0,
-      "resource_type": 4,
+      "resource_type": "wood",
       "resource_number": 5,
       "robber": false
     },
     {
       "q": 4,
       "r": -2,
-      "resource_type": 5,
-      "resource_number": 8,
+      "resource_type": "sheep",
+      "resource_number": 10,
       "robber": false
     }
   ],
@@ -584,8 +584,8 @@
   ],
   "bank": {
     "wood": 19,
-    "brick": 18,
-    "wheat": 18,
+    "brick": 19,
+    "wheat": 19,
     "sheep": 19,
     "ore": 19
   },
@@ -593,13 +593,13 @@
     "1": {
       "wood": 5,
       "brick": 5,
-      "wheat": 6,
+      "wheat": 5,
       "sheep": 5,
       "ore": 5
     },
     "2": {
       "wood": 5,
-      "brick": 6,
+      "brick": 5,
       "wheat": 5,
       "sheep": 5,
       "ore": 5

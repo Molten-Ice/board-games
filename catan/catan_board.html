@@ -85,6 +85,89 @@
             display: flex;
             gap: 20px;
         }
+
+        .controls button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .controls button:hover {
+            background: #c0392b;
+        }
+
+        .action-button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background: #2980b9;
+        }
+
+        .action-button.active {
+            background: #e74c3c;
+        }
+
+        .settlement-spot {
+            cursor: pointer;
+        }
+
+        .custom-confirm {
+            position: fixed;
+            background: #34495e;
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .custom-confirm .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: flex-end;
+        }
+
+        .custom-confirm button {
+            padding: 5px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .custom-confirm .confirm-yes {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .custom-confirm .confirm-no {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .resource-symbol {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+
+        .resource-name {
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -97,6 +180,14 @@
                 <option value="3">Player 3</option>
                 <option value="4">Player 4</option>
             </select>
+            <button id="reset-board">Reset Board</button>
+            <select id="board-type">
+                <option value="highest_production">Highest Production</option>
+                <option value="default">Default Board</option>
+                <option value="settlement_cutoff">Settlement Cutoff</option>
+            </select>
+            <button id="place-settlement" class="action-button">Place Settlement</button>
+            <button id="place-road" class="action-button">Place Road</button>
         </div>
         <div class="board-and-cards">
             <div class="board-container">
@@ -131,7 +222,7 @@
             wood: '#2ecc71',
             brick: '#e74c3c',
             wheat: '#f1c40f',
-            sheep: '#95a5a6',
+            sheep: '#ecf0f1',
             ore: '#7f8c8d',
             desert: '#bdc3c7'
         };
@@ -262,6 +353,64 @@
                     }
                 }
             });
+
+            // Highlight valid settlement spots
+            if (isPlacingSettlement) {
+                boardState.vertex_cells.forEach(vertex => {
+                    if (validSettlementSpots.includes(vertex.unique_id)) {
+                        const [x, y] = getHexCoordinates(vertex.q, vertex.r);
+                        ctx.beginPath();
+                        ctx.arc(x, y, 12, 0, Math.PI * 2);
+                        ctx.strokeStyle = '#3498db';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                });
+            }
+
+            // Highlight valid road spots
+            if (isPlacingRoad) {
+                if (selectedRoadStart === null) {
+                    // Highlight all valid starting points
+                    const validStarts = new Set(validRoadSpots.map(([start, _]) => start));
+                    boardState.vertex_cells.forEach(vertex => {
+                        if (validStarts.has(vertex.unique_id)) {
+                            const [x, y] = getHexCoordinates(vertex.q, vertex.r);
+                            ctx.beginPath();
+                            ctx.arc(x, y, 12, 0, Math.PI * 2);
+                            ctx.strokeStyle = '#3498db';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+                        }
+                    });
+                } else {
+                    // Highlight selected start point and valid end points
+                    const validEnds = validRoadSpots
+                        .filter(([start, end]) => start === selectedRoadStart || end === selectedRoadStart)
+                        .map(([start, end]) => start === selectedRoadStart ? end : start);
+
+                    // Draw selected start point
+                    const startVertex = boardState.vertex_cells.find(v => v.unique_id === selectedRoadStart);
+                    const [sx, sy] = getHexCoordinates(startVertex.q, startVertex.r);
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 12, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#e74c3c';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    // Draw valid end points
+                    boardState.vertex_cells.forEach(vertex => {
+                        if (validEnds.includes(vertex.unique_id)) {
+                            const [x, y] = getHexCoordinates(vertex.q, vertex.r);
+                            ctx.beginPath();
+                            ctx.arc(x, y, 12, 0, Math.PI * 2);
+                            ctx.strokeStyle = '#3498db';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+                        }
+                    });
+                }
+            }
         }
 
         function updateResourceDisplay(resources, elementId) {
@@ -271,31 +420,267 @@
                 const div = document.createElement('div');
                 div.className = 'resource';
                 div.innerHTML = `
-                    <span>${resource}</span>
+                    <span class="resource-name">
+                        <span class="resource-symbol" style="background: ${resourceColors[resource]}"></span>
+                        ${resource}
+                    </span>
                     <span>${amount}</span>
                 `;
                 container.appendChild(div);
             });
         }
 
+        let isPlacingSettlement = false;
+        let validSettlementSpots = [];
+        let isPlacingRoad = false;
+        let validRoadSpots = [];
+        let selectedRoadStart = null;
+
         // Add player selection handling
         document.getElementById('player-select').addEventListener('change', function(e) {
-            const playerId = e.target.value;
+            const playerId = parseInt(e.target.value);
             document.getElementById('active-player-name').textContent = `Player ${playerId}`;
-            fetch('board.json')
+            fetch('http://localhost:5000/api/board-state')
                 .then(response => response.json())
-                .then(boardState => {
-                    updateResourceDisplay(boardState.players[playerId], 'active-player-resources');
+                .then(data => {
+                    updateResourceDisplay(data.board.players[playerId], 'active-player-resources');
                 });
         });
 
-        // Update the fetch call at the bottom
-        fetch('board.json')
+        // Add reset board handling
+        document.getElementById('reset-board').addEventListener('click', function() {
+            if (confirm('Are you sure you want to reset the board? This will start a new game.')) {
+                const boardType = document.getElementById('board-type').value;
+                fetch('http://localhost:5000/api/reset-board', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ board_type: boardType })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    drawBoard(data.board);
+                    updateResourceDisplay(data.board.bank, 'bank-resources');
+                    updateResourceDisplay(data.board.players[1], 'active-player-resources');
+                })
+                .catch(error => console.error('Error resetting board:', error));
+            }
+        });
+
+        // Add settlement placement handling
+        document.getElementById('place-settlement').addEventListener('click', function() {
+            const button = this;
+            isPlacingSettlement = !isPlacingSettlement;
+            button.classList.toggle('active');
+
+            if (isPlacingSettlement) {
+                fetch('http://localhost:5000/api/board-state')
+                    .then(response => response.json())
+                    .then(data => {
+                        const playerId = parseInt(document.getElementById('player-select').value);
+                        const playerActions = data.board.next_actions[playerId];
+                        validSettlementSpots = playerActions.settlement || [];
+                        drawBoard(data.board); // This will now highlight valid spots
+                    });
+            } else {
+                fetch('http://localhost:5000/api/board-state')
+                    .then(response => response.json())
+                    .then(data => {
+                        drawBoard(data.board);
+                    });
+            }
+        });
+
+        // Add road placement handling
+        document.getElementById('place-road').addEventListener('click', function() {
+            const button = this;
+            isPlacingRoad = !isPlacingRoad;
+            selectedRoadStart = null;
+            button.classList.toggle('active');
+
+            if (isPlacingRoad) {
+                fetch('http://localhost:5000/api/board-state')
+                    .then(response => response.json())
+                    .then(data => {
+                        const playerId = parseInt(document.getElementById('player-select').value);
+                        const playerActions = data.board.next_actions[playerId];
+                        validRoadSpots = playerActions.roads || [];
+                        drawBoard(data.board);
+                    });
+            } else {
+                fetch('http://localhost:5000/api/board-state')
+                    .then(response => response.json())
+                    .then(data => {
+                        drawBoard(data.board);
+                    });
+            }
+        });
+
+        function showCustomConfirm(message, x, y) {
+            return new Promise((resolve) => {
+                const dialog = document.createElement('div');
+                dialog.className = 'custom-confirm';
+                dialog.innerHTML = `
+                    <div>${message}</div>
+                    <div class="buttons">
+                        <button class="confirm-no">No</button>
+                        <button class="confirm-yes">Yes</button>
+                    </div>
+                `;
+
+                // Position the dialog near the click
+                dialog.style.left = `${x}px`;
+                dialog.style.top = `${y}px`;
+
+                // Ensure dialog stays within viewport
+                document.body.appendChild(dialog);
+                const rect = dialog.getBoundingClientRect();
+                if (rect.right > window.innerWidth) {
+                    dialog.style.left = `${x - rect.width}px`;
+                }
+                if (rect.bottom > window.innerHeight) {
+                    dialog.style.top = `${y - rect.height}px`;
+                }
+
+                const handleResponse = (response) => {
+                    dialog.remove();
+                    resolve(response);
+                };
+
+                dialog.querySelector('.confirm-yes').addEventListener('click', () => handleResponse(true));
+                dialog.querySelector('.confirm-no').addEventListener('click', () => handleResponse(false));
+            });
+        }
+
+        // Modify the canvas click handler to use the new confirm dialog
+        document.getElementById('boardCanvas').addEventListener('click', async function(event) {
+            const rect = this.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            try {
+                const response = await fetch('http://localhost:5000/api/board-state');
+                const data = await response.json();
+                const playerId = parseInt(document.getElementById('player-select').value);
+                const playerActions = data.board.next_actions[playerId];
+
+                // Handle settlement placement
+                if (isPlacingSettlement) {
+                    for (const vertex of data.board.vertex_cells) {
+                        const [vx, vy] = getHexCoordinates(vertex.q, vertex.r);
+                        const distance = Math.sqrt(Math.pow(x - vx, 2) + Math.pow(y - vy, 2));
+                        
+                        if (distance < 15 && validSettlementSpots.includes(vertex.unique_id)) {
+                            const confirmed = await showCustomConfirm('Do you want to place a settlement here?', event.clientX, event.clientY);
+                            if (confirmed) {
+                                const response = await fetch('http://localhost:5000/api/place-settlement', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        vertex_id: parseInt(vertex.unique_id),
+                                        player_id: playerId
+                                    })
+                                });
+                                const result = await response.json();
+                                window.location.reload();  // Force page refresh
+                            }
+                            break;
+                        }
+                    }
+                } 
+                // Handle city placement
+                else if (!isPlacingRoad) {
+                    for (const vertex of data.board.vertex_cells) {
+                        const [vx, vy] = getHexCoordinates(vertex.q, vertex.r);
+                        const distance = Math.sqrt(Math.pow(x - vx, 2) + Math.pow(y - vy, 2));
+                        
+                        // Check if click is on a settlement and it's in the valid city spots
+                        if (distance < 15 && 
+                            vertex.building === 'settlement' && 
+                            vertex.owner_id === playerId &&
+                            playerActions.city && 
+                            playerActions.city.includes(vertex.unique_id)) {
+                            
+                            const confirmed = await showCustomConfirm('Do you want to upgrade this settlement to a city?', event.clientX, event.clientY);
+                            if (confirmed) {
+                                const response = await fetch('http://localhost:5000/api/build-city', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        vertex_id: parseInt(vertex.unique_id),
+                                        player_id: playerId
+                                    })
+                                });
+                                const result = await response.json();
+                                window.location.reload();  // Force page refresh
+                            }
+                            break;
+                        }
+                    }
+                }
+                // Handle road placement
+                else {
+                    for (const vertex of data.board.vertex_cells) {
+                        const [vx, vy] = getHexCoordinates(vertex.q, vertex.r);
+                        const distance = Math.sqrt(Math.pow(x - vx, 2) + Math.pow(y - vy, 2));
+                        
+                        if (distance < 15) {
+                            if (!selectedRoadStart) {
+                                // First click - selecting start point
+                                const validStarts = new Set(validRoadSpots.map(([start, _]) => start));
+                                if (validStarts.has(vertex.unique_id)) {
+                                    selectedRoadStart = vertex.unique_id;
+                                    drawBoard(data.board); // Redraw to show selected point
+                                }
+                            } else {
+                                // Second click - selecting end point
+                                const validEnd = validRoadSpots.some(([start, end]) => 
+                                    start === selectedRoadStart && end === vertex.unique_id ||
+                                    end === selectedRoadStart && start === vertex.unique_id
+                                );
+                                
+                                if (validEnd) {
+                                    const confirmed = await showCustomConfirm('Do you want to place a road here?', event.clientX, event.clientY);
+                                    if (confirmed) {
+                                        const response = await fetch('http://localhost:5000/api/place-road', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                start_vertex: parseInt(selectedRoadStart),
+                                                end_vertex: parseInt(vertex.unique_id),
+                                                player_id: playerId
+                                            })
+                                        });
+                                        const result = await response.json();
+                                        window.location.reload();  // Force page refresh
+                                    }
+                                }
+                                selectedRoadStart = null;
+                                drawBoard(data.board);
+                            }
+                            break;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error in click handler:', error);
+            }
+        });
+
+        // Initial board state fetch
+        fetch('http://localhost:5000/api/board-state')
             .then(response => response.json())
-            .then(boardState => {
-                drawBoard(boardState);
-                updateResourceDisplay(boardState.bank, 'bank-resources');
-                updateResourceDisplay(boardState.players[1], 'active-player-resources');
+            .then(data => {
+                drawBoard(data.board);
+                updateResourceDisplay(data.board.bank, 'bank-resources');
+                updateResourceDisplay(data.board.players[1], 'active-player-resources');
             })
             .catch(error => console.error('Error loading board:', error));
     </script>

@@ -25,8 +25,8 @@ def load_game_state():
             return pickle.load(f)
     
     print('load_game_state | Setting up new game')
-    # board = EndpointHelpers.handle_start_game()
-    board = ExampleBoards.example_settlement_cutoff_board()
+    board = BoardUtils.setup_board()
+    # board = ExampleBoards.example_settlement_cutoff_board()
     return board
         
 
@@ -56,7 +56,7 @@ def place_settlement():
     """Place a settlement at the specified vertex""" 
     data = request.get_json()
     vertex_id = data.get('vertex_id')
-    player_id = data.get('player_id')
+    player_id = str(data.get('player_id'))
     
     board = load_game_state()
     output_board = EndpointHelpers.handle_place_settlement(board, vertex_id, player_id)
@@ -69,7 +69,7 @@ def place_road():
     data = request.get_json()
     start_vertex = data.get('start_vertex')
     end_vertex = data.get('end_vertex')
-    player_id = data.get('player_id')
+    player_id = str(data.get('player_id'))
 
     board = load_game_state()
     output_board = EndpointHelpers.handle_place_road(board, start_vertex, end_vertex, player_id)
@@ -91,12 +91,34 @@ def build_city():
    
     data = request.get_json()
     vertex_id = data.get('vertex_id')
-    player_id = data.get('player_id')
+    player_id = str(data.get('player_id'))
 
     board = load_game_state()
     output_board = EndpointHelpers.handle_build_city(board, vertex_id, player_id)
     save_game_state(output_board)
     return jsonify({'prev_board': board.get_board_state(get_next_actions=False), 'board': output_board.get_board_state()})
+
+@app.route('/api/reset-board', methods=['POST'])
+def reset_board():
+    """Reset the game board to initial state
+    
+    Accepts board_type parameter:
+    - 'default': Regular game board setup
+    - 'settlement_cutoff': Example board with settlement cutoff scenario
+    - 'highest_production': Example board with highest production first spots
+    """
+    data = request.get_json()
+    board_type = data.get('board_type', 'default')
+    
+    if board_type == 'settlement_cutoff':
+        board = ExampleBoards.example_settlement_cutoff_board()
+    elif board_type == 'highest_production':
+        board = ExampleBoards.example_highest_production_first_spots()
+    else:  # default
+        board = BoardUtils.setup_board()
+        
+    save_game_state(board)
+    return jsonify({'board': board.get_board_state()})
 
 if __name__ == "__main__":
     app.run(debug=True) 
