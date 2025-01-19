@@ -83,43 +83,6 @@ def visualization_catan_board(board_state, sf=30.0):
 
     root.mainloop()
 
-
-class Board:
-    def __init__(self):
-        self.hex_cells = {}
-        self.vertex_cells = {}
-        self.bank = Bank()
-        self.players = [Player(pid) for pid in range(1, 5)]
-
-    def get_board_state(self):
-        roads = []
-        for vertex_cell in self.vertex_cells.values():
-            for other_vertex_id, owner_id in vertex_cell.roads.items():
-                roads.append((min(vertex_cell.unique_id, other_vertex_id), max(vertex_cell.unique_id, other_vertex_id), owner_id))
-        roads = list(set(roads))
-        # print(f'roads: {roads}')
-
-        return {
-            'hexes': [{
-                'q': hex_cell.q,
-                'r': hex_cell.r,
-                'resource_type': hex_cell.resource_type.value,
-                'resource_number': hex_cell.resource_number,
-                'robber': hex_cell.robber
-            } for hex_cell in self.hex_cells.values()],
-            'vertex_cells': [{
-                'q': vertex_cell.q,
-                'r': vertex_cell.r,
-                'unique_id': vertex_cell.unique_id,
-                'owner_id': vertex_cell.owner_id,
-                'building': vertex_cell.building.name if vertex_cell.building else None
-            } for vertex_cell in self.vertex_cells.values()],
-            'roads': roads,
-            'bank': {k.name: v for k, v in self.bank.resources.items()},
-            'players': {player.pid: {k.name: v for k, v in player.resources.items()} for player in self.players}
-        }
-    
-
 def generate_hex_grid():
     hex_cells = []
     vertex_cells = []
@@ -155,6 +118,46 @@ def generate_hex_grid():
     return hex_cells_dict, vertex_cells_dict
 
 
+class Board:
+    def __init__(self):
+        self.hex_cells = {}
+        self.vertex_cells = {}
+        self.bank = Bank()
+        self.players = {id : Player(id) for id in range(1, 5)}
+        self.current_player = 1
+
+    def get_board_state(self):
+        roads = []
+        for vertex_cell in self.vertex_cells.values():
+            for other_vertex_id, owner_id in vertex_cell.roads.items():
+                roads.append((min(vertex_cell.unique_id, other_vertex_id), max(vertex_cell.unique_id, other_vertex_id), owner_id))
+        roads = list(set(roads))
+        # print(f'roads: {roads}')
+
+        return {
+            'hexes': [{
+                'q': hex_cell.q,
+                'r': hex_cell.r,
+                'resource_type': hex_cell.resource_type.value,
+                'resource_number': hex_cell.resource_number,
+                'robber': hex_cell.robber
+            } for hex_cell in self.hex_cells.values()],
+            'vertex_cells': [{
+                'q': vertex_cell.q,
+                'r': vertex_cell.r,
+                'unique_id': vertex_cell.unique_id,
+                'owner_id': vertex_cell.owner_id,
+                'building': vertex_cell.building.name if vertex_cell.building else None
+            } for vertex_cell in self.vertex_cells.values()],
+            'roads': roads,
+            'bank': {k.name: v for k, v in self.bank.resources.items()},
+            'players': {id: {k.name: v for k, v in player.resources.items()} for id, player in self.players.items()}
+        }
+    
+
+
+
+
 
 CellType = Enum('CellType', ['hex', 'vertex'])
 BuildingType = Enum('BuildingType', ['settlement', 'city'])
@@ -170,6 +173,9 @@ class Player:
             ResourceType.sheep: 0,
             ResourceType.ore: 0
         }
+        for k in self.resources.keys():
+            self.resources[k] += 5
+
 
 class Bank:
     def __init__(self):
@@ -226,6 +232,15 @@ def is_neighbor(spot1, spot2):
 
 class BoardUtils:
     @staticmethod
+    def setup_board():
+        board = Board()
+        board.hex_cells, board.vertex_cells = generate_hex_grid()
+
+        BoardUtils.setup_resources(board)
+        BoardUtils.assign_valid_resource_numbers(board)
+        return board
+
+    @staticmethod
     def setup_resources(board):
         """Convert the old coordinate system to the new matrix-based one"""
         resources = [
@@ -281,12 +296,8 @@ class BoardUtils:
         raise Exception(f"Could not create valid number distribution after {max_attempts} attempts")
     
     @staticmethod
-    def valid_settlements(board, owner_id = None):
-        if owner_id is None:
-            starting_nodes = [v for v in board.vertex_cells.values() if v.building is None]
-        else: # Not starting placement - restrict to road ends.
-            starting_nodes = [v for v in board.vertex_cells.values() if v.building is None and 
-                            any([x == owner_id for x in v.roads.values()])]
+    def valid_settlements(board):
+        starting_nodes = [v for v in board.vertex_cells.values() if v.building is None]
 
         def is_valid_spot(possible_spot):
             for neighbour_id in possible_spot.neighbor_vertexes:
@@ -349,17 +360,60 @@ class BoardUtils:
                     if hex.resource_number == dice_roll and not hex.robber:
                         factor = 1 if building.building == BuildingType.settlement else 2
                         if board.bank.resources[hex.resource_type] >= factor:
-                            board.players[player_id-1].resources[hex.resource_type] += factor
+                            board.players[player_id].resources[hex.resource_type] += factor
                             board.bank.resources[hex.resource_type] -= factor
                             print(f'Collected {factor} {hex.resource_type.name} from {hex_id} for player {player_id}')
                         else:
                             print(f'Player {player_id} does not have enough resources to collect {factor} {hex.resource_type}')
                             if board.bank.resources[hex.resource_type] == 1:
                                 print(f'Given 1 out of 2 of {hex.resource_type} to {player_id}')
-                                board.players[player_id-1].resources[hex.resource_type] += 1
+                                board.players[player_id].resources[hex.resource_type] += 1
         return board
 
-
+    @staticmethod
+    def valid_origin_vertices(board, player_id):
+        """
+        Finds all valid vertices where a player could build their next road from.
+        Uses BFS to explore all reachable vertices from each building.
+        
+        Returns:
+            set: Vertex IDs that are valid starting points for new roads
+        """
+        from collections import deque
+        
+        # Start with all building locations as valid origins
+        buildings = {v.unique_id for v in board.vertex_cells.values() 
+                    if v.owner_id == player_id and v.building is not None}
+        valid_origins = buildings.copy()
+        
+        # For each building, explore all connected paths
+        for building_id in buildings:
+            visited = {building_id}
+            queue = deque([building_id])
+            
+            while queue:
+                current_vertex_id = queue.popleft()
+                current_vertex = board.vertex_cells[current_vertex_id]
+                
+                # Check all roads from this vertex
+                for neighbor_id in current_vertex.roads:
+                    # Skip if we've already visited this vertex
+                    if neighbor_id in visited:
+                        continue
+                        
+                    neighbor = board.vertex_cells[neighbor_id]
+                    # Skip if blocked by opponent's building
+                    if neighbor.building is not None and neighbor.owner_id != player_id:
+                        continue
+                        
+                    # If this road belongs to the player, we can traverse it
+                    if current_vertex.roads[neighbor_id] == player_id:
+                        visited.add(neighbor_id)
+                        queue.append(neighbor_id)
+                        valid_origins.add(neighbor_id)
+        
+        return sorted(list(valid_origins))
+ 
 """
 TODO:
 ALlow users to interact with the board.
@@ -371,19 +425,39 @@ trading
 
 def print_resources(board):
     print(f'Bank resources: {[f"{k.name}: {v}" for k, v in board.bank.resources.items()]}')
-    for player in board.players:
-        print(f'Player {player.pid} resources: {[f"{k.name}: {v}" for k, v in player.resources.items()]}')
+    for id, player in board.players.items():
+        print(f'Player {id} resources: {[f"{k.name}: {v}" for k, v in player.resources.items()]}')
 
 
+def example_settlement_cutoff_board():
+    board = BoardUtils.setup_board()
 
-if __name__ == "__main__":
+    ## Testing road length and settlment placement for road cut off
+    # Player 1
+    vertex_cell = board.vertex_cells[32]
+    vertex_cell.owner_id = 1
+    vertex_cell.building = BuildingType.settlement
+    vertex_cell.roads[38] = 1
+    board.vertex_cells[38].roads[32] = 1
 
-    board = Board()
-    board.hex_cells, board.vertex_cells = generate_hex_grid()
+    board.vertex_cells[38].roads[37] = 1
+    board.vertex_cells[37].roads[38] = 1
 
-    BoardUtils.setup_resources(board)
-    BoardUtils.assign_valid_resource_numbers(board)
+    vertex_cell = board.vertex_cells[37]
+    vertex_cell.owner_id = 1
+    vertex_cell.building = BuildingType.settlement
+    #Player 2
+    vertex_cell = board.vertex_cells[25]
+    vertex_cell.owner_id = 2
+    vertex_cell.building = BuildingType.settlement
+    from itertools import pairwise
+    for start, end in pairwise([25, 31, 37, 43]):
+        board.vertex_cells[start].roads[end] = 2
+        board.vertex_cells[end].roads[start] = 2
+    return board
 
+def example_highest_production_first_spots():
+    board = BoardUtils.setup_board()
     for owner_id in range(1, 5):
         vertex_id = BoardUtils.highest_production_spot(board)
         vertex_cell = board.vertex_cells[vertex_id]
@@ -398,16 +472,68 @@ if __name__ == "__main__":
                 continue
             board.players[owner_id-1].resources[resource_type] += 1
             board.bank.resources[resource_type] -= 1
+    return board
+
+"""
+API:
+actionable moves. Return a list of player ids with the thing each player can do
+
+API interaction order:
+a) roll dice 
+-> backend picks up all resources. (frontend also given previous state so it can visualize)
+-> player given option to place settlements etc.
+"""
+
+def possible_next_actions(board, player_id):
+    actions = {'player_id' : player_id}
+    player_buildings = [v for v in board.vertex_cells.values() if v.owner_id == player_id]
+    cities = [b for b in player_buildings if b.building == BuildingType.city]
+    settlements = [b for b in player_buildings if b.building == BuildingType.settlement]
+    resources = board.players[player_id].resources
+    if len(cities) < 5 and resources[ResourceType.ore] >= 3 and resources[ResourceType.wheat] >= 5:
+        actions[BuildingType.city] = [v.unique_id for v in settlements]
+
+    valid_vertices = BoardUtils.valid_origin_vertices(board, player_id)
+
+    if len(settlements) < 5 and (resources[ResourceType.wood] > 0 and resources[ResourceType.brick] > 0 
+                    and resources[ResourceType.wheat] > 0 and resources[ResourceType.sheep] > 0):
+        all_valid_settlements = BoardUtils.valid_settlements(board)
+       
+        valid_settlement_spots = [v for v in all_valid_settlements if v in valid_vertices]
+        actions[BuildingType.settlement] = valid_settlement_spots
+
+    if resources[ResourceType.wood] > 0 and resources[ResourceType.brick] > 0:
+        possible_roads = []
+        for id in valid_vertices:
+            vertex = board.vertex_cells[id]
+
+            current_roads =  list(vertex.roads.keys())
+            for road_id in vertex.neighbor_vertexes:
+                if road_id not in current_roads:
+                    possible_roads.append((min(id, road_id), max(id, road_id)))
+        possible_roads = sorted(list(set(possible_roads)))
+        actions['roads'] = possible_roads
+    return actions
+
+if __name__ == "__main__":
+    # board = BoardUtils.setup_board()
+    board = example_settlement_cutoff_board()
 
     dice1, dice2 = random.randint(1, 6), random.randint(1, 6)
     BoardUtils.collect_resources(board, dice1 + dice2)
     print_resources(board)
 
+    next_actions = possible_next_actions(board, 1)
+    print(next_actions)
+
+    next_actions = possible_next_actions(board, 2)
+    print(next_actions)
+
     board_state = board.get_board_state()
     with open('board.json', 'w') as f:
         json.dump(board_state, f, indent=2)
 
-    # visualization_catan_board(board_state)
+    visualization_catan_board(board_state)
 
 # python -m http.server
 # http://localhost:8000/catan_board.html

@@ -3,135 +3,135 @@
     {
       "q": -4,
       "r": 2,
-      "resource_type": 1,
+      "resource_type": 3,
       "resource_number": 8,
       "robber": false
     },
     {
       "q": -3,
       "r": 0,
-      "resource_type": 5,
-      "resource_number": 4,
+      "resource_type": 2,
+      "resource_number": 10,
       "robber": false
     },
     {
       "q": -3,
       "r": 3,
-      "resource_type": 2,
-      "resource_number": 3,
+      "resource_type": 5,
+      "resource_number": 9,
       "robber": false
     },
     {
       "q": -2,
       "r": -2,
-      "resource_type": 4,
-      "resource_number": 8,
+      "resource_type": 1,
+      "resource_number": 4,
       "robber": false
     },
     {
       "q": -2,
       "r": 1,
       "resource_type": 1,
-      "resource_number": 11,
+      "resource_number": 4,
       "robber": false
     },
     {
       "q": -2,
       "r": 4,
-      "resource_type": 3,
-      "resource_number": 11,
+      "resource_type": 5,
+      "resource_number": 2,
       "robber": false
     },
     {
       "q": -1,
       "r": -1,
       "resource_type": 2,
-      "resource_number": 9,
+      "resource_number": 6,
       "robber": false
     },
     {
       "q": -1,
       "r": 2,
-      "resource_type": 2,
-      "resource_number": 9,
+      "resource_type": 3,
+      "resource_number": 8,
       "robber": false
     },
     {
       "q": 0,
       "r": -3,
-      "resource_type": 3,
-      "resource_number": 10,
-      "robber": false
+      "resource_type": 6,
+      "resource_number": -1,
+      "robber": true
     },
     {
       "q": 0,
       "r": 0,
       "resource_type": 5,
-      "resource_number": 6,
+      "resource_number": 5,
       "robber": false
     },
     {
       "q": 0,
       "r": 3,
       "resource_type": 1,
-      "resource_number": 2,
+      "resource_number": 5,
       "robber": false
     },
     {
       "q": 1,
       "r": -2,
       "resource_type": 4,
-      "resource_number": 5,
+      "resource_number": 11,
       "robber": false
     },
     {
       "q": 1,
       "r": 1,
       "resource_type": 4,
-      "resource_number": 5,
-      "robber": false
-    },
-    {
-      "q": 2,
-      "r": -4,
-      "resource_type": 1,
-      "resource_number": 4,
-      "robber": false
-    },
-    {
-      "q": 2,
-      "r": -1,
-      "resource_type": 3,
       "resource_number": 12,
       "robber": false
     },
     {
       "q": 2,
+      "r": -4,
+      "resource_type": 4,
+      "resource_number": 6,
+      "robber": false
+    },
+    {
+      "q": 2,
+      "r": -1,
+      "resource_type": 4,
+      "resource_number": 9,
+      "robber": false
+    },
+    {
+      "q": 2,
       "r": 2,
-      "resource_type": 3,
+      "resource_type": 1,
       "resource_number": 3,
       "robber": false
     },
     {
       "q": 3,
       "r": -3,
-      "resource_type": 4,
-      "resource_number": 6,
+      "resource_type": 3,
+      "resource_number": 3,
       "robber": false
     },
     {
       "q": 3,
       "r": 0,
-      "resource_type": 5,
+      "resource_type": 2,
       "resource_number": 10,
       "robber": false
     },
     {
       "q": 4,
       "r": -2,
-      "resource_type": 6,
-      "resource_number": -1,
-      "robber": true
+      "resource_type": 3,
+      "resource_number": 11,
+      "robber": false
     }
   ],
   "vertex_cells": [
@@ -230,8 +230,8 @@
       "q": -2,
       "r": -1,
       "unique_id": 13,
-      "owner_id": 3,
-      "building": "settlement"
+      "owner_id": null,
+      "building": null
     },
     {
       "q": -2,
@@ -314,22 +314,22 @@
       "q": 0,
       "r": -2,
       "unique_id": 25,
-      "owner_id": null,
-      "building": null
+      "owner_id": 2,
+      "building": "settlement"
     },
     {
       "q": 0,
       "r": -1,
       "unique_id": 26,
-      "owner_id": 1,
-      "building": "settlement"
+      "owner_id": null,
+      "building": null
     },
     {
       "q": 0,
       "r": 1,
       "unique_id": 27,
-      "owner_id": 2,
-      "building": "settlement"
+      "owner_id": null,
+      "building": null
     },
     {
       "q": 0,
@@ -363,8 +363,8 @@
       "q": 1,
       "r": -1,
       "unique_id": 32,
-      "owner_id": null,
-      "building": null
+      "owner_id": 1,
+      "building": "settlement"
     },
     {
       "q": 1,
@@ -398,7 +398,7 @@
       "q": 2,
       "r": -3,
       "unique_id": 37,
-      "owner_id": 4,
+      "owner_id": 1,
       "building": "settlement"
     },
     {
@@ -516,61 +516,66 @@
   ],
   "roads": [
     [
-      21,
-      27,
-      2
-    ],
-    [
-      26,
       32,
+      38,
       1
     ],
     [
-      13,
-      14,
-      3
+      37,
+      43,
+      2
     ],
     [
       31,
       37,
-      4
+      2
+    ],
+    [
+      37,
+      38,
+      1
+    ],
+    [
+      25,
+      31,
+      2
     ]
   ],
   "bank": {
-    "wood": 18,
-    "brick": 16,
+    "wood": 19,
+    "brick": 19,
     "wheat": 19,
-    "sheep": 14,
-    "ore": 16
+    "sheep": 19,
+    "ore": 18
   },
   "players": {
     "1": {
-      "wood": 0,
-      "brick": 1,
-      "wheat": 0,
-      "sheep": 1,
-      "ore": 1
+      "wood": 5,
+      "brick": 5,
+      "wheat": 5,
+      "sheep": 5,
+      "ore": 6
     },
     "2": {
-      "wood": 0,
-      "brick": 1,
-      "wheat": 0,
-      "sheep": 1,
-      "ore": 1
+      "wood": 5,
+      "brick": 5,
+      "wheat": 5,
+      "sheep": 5,
+      "ore": 5
     },
     "3": {
-      "wood": 0,
-      "brick": 1,
-      "wheat": 0,
-      "sheep": 1,
-      "ore": 1
+      "wood": 5,
+      "brick": 5,
+      "wheat": 5,
+      "sheep": 5,
+      "ore": 5
     },
     "4": {
-      "wood": 1,
-      "brick": 0,
-      "wheat": 0,
-      "sheep": 2,
-      "ore": 0
+      "wood": 5,
+      "brick": 5,
+      "wheat": 5,
+      "sheep": 5,
+      "ore": 5
     }
   }
 }
