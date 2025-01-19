@@ -4,134 +4,134 @@
     {
       "q": -4,
       "r": 2,
-      "resource_type": 1,
+      "resource_type": 4,
       "resource_number": 11,
       "robber": false
     },
     {
       "q": -3,
       "r": 0,
-      "resource_type": 1,
+      "resource_type": 3,
       "resource_number": 10,
       "robber": false
     },
     {
       "q": -3,
       "r": 3,
-      "resource_type": 4,
+      "resource_type": 5,
+      "resource_number": 4,
+      "robber": false
+    },
+    {
+      "q": -2,
+      "r": -2,
+      "resource_type": 3,
+      "resource_number": 5,
+      "robber": false
+    },
+    {
+      "q": -2,
+      "r": 1,
+      "resource_type": 2,
       "resource_number": 8,
       "robber": false
     },
     {
       "q": -2,
-      "r": -2,
-      "resource_type": 1,
-      "resource_number": 9,
-      "robber": false
-    },
-    {
-      "q": -2,
-      "r": 1,
-      "resource_type": 3,
-      "resource_number": 2,
-      "robber": false
-    },
-    {
-      "q": -2,
       "r": 4,
-      "resource_type": 4,
+      "resource_type": 3,
       "resource_number": 9,
       "robber": false
     },
     {
       "q": -1,
       "r": -1,
-      "resource_type": 2,
-      "resource_number": 3,
+      "resource_type": 4,
+      "resource_number": 12,
       "robber": false
     },
     {
       "q": -1,
       "r": 2,
-      "resource_type": 3,
-      "resource_number": 4,
+      "resource_type": 4,
+      "resource_number": 2,
       "robber": false
     },
     {
       "q": 0,
       "r": -3,
       "resource_type": 5,
-      "resource_number": 5,
+      "resource_number": 10,
       "robber": false
     },
     {
       "q": 0,
       "r": 0,
-      "resource_type": 2,
-      "resource_number": 12,
+      "resource_type": 4,
+      "resource_number": 3,
       "robber": false
     },
     {
       "q": 0,
       "r": 3,
-      "resource_type": 6,
-      "resource_number": -1,
-      "robber": true
+      "resource_type": 2,
+      "resource_number": 6,
+      "robber": false
     },
     {
       "q": 1,
       "r": -2,
-      "resource_type": 4,
-      "resource_number": 6,
+      "resource_type": 1,
+      "resource_number": 4,
       "robber": false
     },
     {
       "q": 1,
       "r": 1,
-      "resource_type": 5,
-      "resource_number": 6,
-      "robber": false
-    },
-    {
-      "q": 2,
-      "r": -4,
-      "resource_type": 2,
-      "resource_number": 4,
-      "robber": false
-    },
-    {
-      "q": 2,
-      "r": -1,
-      "resource_type": 1,
-      "resource_number": 11,
-      "robber": false
-    },
-    {
-      "q": 2,
-      "r": 2,
-      "resource_type": 3,
-      "resource_number": 10,
-      "robber": false
-    },
-    {
-      "q": 3,
-      "r": -3,
       "resource_type": 3,
       "resource_number": 3,
       "robber": false
     },
     {
+      "q": 2,
+      "r": -4,
+      "resource_type": 6,
+      "resource_number": -1,
+      "robber": true
+    },
+    {
+      "q": 2,
+      "r": -1,
+      "resource_type": 1,
+      "resource_number": 9,
+      "robber": false
+    },
+    {
+      "q": 2,
+      "r": 2,
+      "resource_type": 2,
+      "resource_number": 5,
+      "robber": false
+    },
+    {
+      "q": 3,
+      "r": -3,
+      "resource_type": 1,
+      "resource_number": 8,
+      "robber": false
+    },
+    {
       "q": 3,
       "r": 0,
-      "resource_type": 4,
-      "resource_number": 5,
+      "resource_type": 1,
+      "resource_number": 6,
       "robber": false
     },
     {
       "q": 4,
       "r": -2,
       "resource_type": 5,
-      "resource_number": 8,
+      "resource_number": 11,
       "robber": false
     }
   ],
@@ -365,7 +365,7 @@
       "r": -1,
       "unique_id": 32,
       "owner_id": 1,
-      "building": "settlement"
+      "building": "city"
     },
     {
       "q": 1,
@@ -448,8 +448,8 @@
       "q": 3,
       "r": -2,
       "unique_id": 44,
-      "owner_id": null,
-      "building": null
+      "owner_id": 1,
+      "building": "settlement"
     },
     {
       "q": 3,
@@ -527,16 +527,6 @@
       1
     ],
     [
-      30,
-      31,
-      2
-    ],
-    [
-      32,
-      33,
-      1
-    ],
-    [
       37,
       43,
       2
@@ -544,16 +534,6 @@
     [
       31,
       37,
-      2
-    ],
-    [
-      19,
-      25,
-      2
-    ],
-    [
-      25,
-      26,
       2
     ],
     [
@@ -570,36 +550,26 @@
       26,
       32,
       1
-    ],
-    [
-      44,
-      45,
-      1
-    ],
-    [
-      44,
-      49,
-      1
     ]
   ],
   "bank": {
-    "wood": 19,
-    "brick": 18,
-    "wheat": 18,
-    "sheep": 19,
-    "ore": 19
+    "wood": 21,
+    "brick": 21,
+    "wheat": 22,
+    "sheep": 20,
+    "ore": 22
   },
   "players": {
     "1": {
-      "wood": 5,
-      "brick": 5,
-      "wheat": 6,
-      "sheep": 5,
-      "ore": 5
+      "wood": 3,
+      "brick": 3,
+      "wheat": 2,
+      "sheep": 4,
+      "ore": 2
     },
     "2": {
       "wood": 5,
-      "brick": 6,
+      "brick": 5,
       "wheat": 5,
       "sheep": 5,
       "ore": 5
@@ -622,43 +592,27 @@
   "next_actions": {
     "1": {
       "player_id": 1,
-      "city": [
-        32,
-        37
-      ],
-      "settlement": [
-        44,
-        45,
-        49
-      ],
+      "settlement": [],
       "roads": [
         [
           20,
           26
         ],
         [
-          27,
+          25,
+          26
+        ],
+        [
+          32,
           33
         ],
         [
-          33,
-          39
-        ],
-        [
-          39,
+          44,
           45
         ],
         [
-          45,
-          50
-        ],
-        [
-          48,
+          44,
           49
-        ],
-        [
-          49,
-          52
         ]
       ]
     },
@@ -667,29 +621,19 @@
       "city": [
         25
       ],
-      "settlement": [
-        30
-      ],
+      "settlement": [],
       "roads": [
         [
-          13,
-          19
+          19,
+          25
         ],
         [
-          18,
-          19
-        ],
-        [
-          20,
+          25,
           26
         ],
         [
-          24,
-          30
-        ],
-        [
           30,
-          36
+          31
         ]
       ]
     },

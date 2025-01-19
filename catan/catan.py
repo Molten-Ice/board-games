@@ -3,6 +3,7 @@ import math
 import random
 import tkinter as tk
 from enum import Enum
+from itertools import pairwise
 
 def visualization_catan_board(board_state, sf=30.0):
     width, height = 800, 800
@@ -126,15 +127,21 @@ class Board:
         self.players = {id : Player(id) for id in range(1, 5)}
         self.current_player = 1
 
-    def get_board_state(self):
+    def get_board_state(self, get_next_actions=True):
         roads = []
         for vertex_cell in self.vertex_cells.values():
             for other_vertex_id, owner_id in vertex_cell.roads.items():
                 roads.append((min(vertex_cell.unique_id, other_vertex_id), max(vertex_cell.unique_id, other_vertex_id), owner_id))
         roads = list(set(roads))
-        # print(f'roads: {roads}')
+
+        if get_next_actions:
+            # next_actions = {self.current_player: BoardUtils.possible_next_actions(self, self.current_player)}
+            next_actions = {id: BoardUtils.possible_next_actions(self, id) for id in self.players.keys()}
+        else:
+            next_actions = {}
 
         return {
+            'current_player': self.current_player,
             'hexes': [{
                 'q': hex_cell.q,
                 'r': hex_cell.r,
@@ -151,7 +158,8 @@ class Board:
             } for vertex_cell in self.vertex_cells.values()],
             'roads': roads,
             'bank': {k.name: v for k, v in self.bank.resources.items()},
-            'players': {id: {k.name: v for k, v in player.resources.items()} for id, player in self.players.items()}
+            'players': {id: {k.name: v for k, v in player.resources.items()} for id, player in self.players.items()},
+            'next_actions': next_actions
         }
     
 
@@ -413,7 +421,177 @@ class BoardUtils:
                         valid_origins.add(neighbor_id)
         
         return sorted(list(valid_origins))
- 
+    
+    @staticmethod
+    def possible_next_actions(board, player_id):
+        actions = {'player_id' : player_id}
+        player_buildings = [v for v in board.vertex_cells.values() if v.owner_id == player_id]
+        cities = [b for b in player_buildings if b.building == BuildingType.city]
+        settlements = [b for b in player_buildings if b.building == BuildingType.settlement]
+        resources = board.players[player_id].resources
+        if len(cities) < 5 and resources[ResourceType.ore] >= 3 and resources[ResourceType.wheat] >= 5:
+            actions[BuildingType.city.name] = [v.unique_id for v in settlements]
+
+        valid_vertices = BoardUtils.valid_origin_vertices(board, player_id)
+
+        if len(settlements) < 5 and (resources[ResourceType.wood] > 0 and resources[ResourceType.brick] > 0 
+                        and resources[ResourceType.wheat] > 0 and resources[ResourceType.sheep] > 0):
+            all_valid_settlements = BoardUtils.valid_settlements(board)
+        
+            valid_settlement_spots = [v for v in all_valid_settlements if v in valid_vertices]
+            actions[BuildingType.settlement.name] = valid_settlement_spots
+
+        if resources[ResourceType.wood] > 0 and resources[ResourceType.brick] > 0:
+            possible_roads = []
+            for id in valid_vertices:
+                vertex = board.vertex_cells[id]
+
+                current_roads =  list(vertex.roads.keys())
+                for road_id in vertex.neighbor_vertexes:
+                    if road_id not in current_roads:
+                        possible_roads.append((min(id, road_id), max(id, road_id)))
+            possible_roads = sorted(list(set(possible_roads)))
+            actions['roads'] = possible_roads
+        return actions
+
+class EndpointHelpers:
+
+    @staticmethod
+    def handle_roll_dice(board, current_player):
+        """Handle dice rolling and resource collection logic"""
+        dice1, dice2 = random.randint(1, 6), random.randint(1, 6)
+        print(f'handle_roll_dice | Rolled dice: {dice1}, {dice2}')
+        dice_sum = dice1 + dice2
+        BoardUtils.collect_resources(board, dice_sum, current_player)
+        return {
+            'dice1': dice1,
+            'dice2': dice2,
+            'board': board.get_board_state()
+        }
+
+    @staticmethod
+    def handle_place_road(board, start_vertex, end_vertex, player_id):
+        """Handle road placement logic"""
+        print(f'handle_place_road called with start_vertex: {start_vertex}, end_vertex: {end_vertex}, and player_id: {player_id}')
+        possible_actions = BoardUtils.possible_next_actions(board, player_id)
+        if 'roads' not in possible_actions or (start_vertex, end_vertex) not in possible_actions['roads']:
+            raise ValueError('Invalid road placement')
+        
+        board.vertex_cells[start_vertex].roads[end_vertex] = player_id
+        board.vertex_cells[end_vertex].roads[start_vertex] = player_id
+        
+        player = board.players[player_id]
+        player.resources[ResourceType.wood] -= 1
+        player.resources[ResourceType.brick] -= 1
+        board.bank.resources[ResourceType.wood] += 1
+        board.bank.resources[ResourceType.brick] += 1
+
+        return board
+
+    @staticmethod
+    def handle_end_turn(board):
+        """Handle end turn logic"""
+        new_player = (board.current_player % 4) + 1
+        print(f'handle_end_turn called, old player: {board.current_player}, new player: {new_player}')
+        board.current_player = new_player
+        return board
+
+    @staticmethod
+    def handle_build_city(board, vertex_id, player_id):
+        """Handle city building logic"""
+        print(f'handle_build_city called with vertex_id: {vertex_id} and player_id: {player_id}')
+        possible_actions = BoardUtils.possible_next_actions(board, player_id)
+        if BuildingType.city.name not in possible_actions or vertex_id not in possible_actions[BuildingType.city.name]:
+            print(f'No city placement possible for player {player_id}')
+            return board
+        vertex = board.vertex_cells[vertex_id]
+        vertex.building = BuildingType.city
+        
+        player = board.players[player_id]
+        player.resources[ResourceType.wheat] -= 2
+        player.resources[ResourceType.ore] -= 3
+        board.bank.resources[ResourceType.wheat] += 2
+        board.bank.resources[ResourceType.ore] += 3
+        return board
+  
+
+    @staticmethod
+    def handle_place_settlement(board, vertex_id, player_id):
+        """Handle settlement placement logic"""
+        print(f'handle_place_settlement called with vertex_id: {vertex_id} and player_id: {player_id}')
+        possible_actions = BoardUtils.possible_next_actions(board, player_id)
+        if BuildingType.settlement.name not in possible_actions or vertex_id not in possible_actions[BuildingType.settlement.name]:
+            print(f'No settlement placement possible for player {player_id}')
+            return board
+        
+        vertex = board.vertex_cells[vertex_id]
+        vertex.owner_id = player_id
+        vertex.building = BuildingType.settlement
+        
+        player = board.players[player_id]
+        for resource_type in [ResourceType.wood, ResourceType.brick, ResourceType.wheat, ResourceType.sheep]:
+            player.resources[resource_type] -= 1
+            board.bank.resources[resource_type] += 1
+        return board
+
+class ExampleBoards:
+    @staticmethod
+    def example_settlement_cutoff_board():
+        board = BoardUtils.setup_board()
+
+        ## Testing road length and settlment placement for road cut off
+        # Player 1
+        vertex_cell = board.vertex_cells[32]
+        vertex_cell.owner_id = 1
+        vertex_cell.building = BuildingType.settlement
+        vertex_cell.roads[38] = 1
+        board.vertex_cells[38].roads[32] = 1
+
+        board.vertex_cells[38].roads[37] = 1
+        board.vertex_cells[37].roads[38] = 1
+
+        board.vertex_cells[38].roads[44] = 1
+        board.vertex_cells[44].roads[38] = 1
+
+        vertex_cell = board.vertex_cells[37]
+        vertex_cell.owner_id = 1
+        vertex_cell.building = BuildingType.settlement
+        #Player 2
+        vertex_cell = board.vertex_cells[25]
+        vertex_cell.owner_id = 2
+        vertex_cell.building = BuildingType.settlement
+        for start, end in pairwise([25, 31, 37, 43]):
+            board.vertex_cells[start].roads[end] = 2
+            board.vertex_cells[end].roads[start] = 2
+        return board
+
+    @staticmethod
+    def example_highest_production_first_spots():
+        board = BoardUtils.setup_board()
+        for owner_id in range(1, 5):
+            vertex_id = BoardUtils.highest_production_spot(board)
+            vertex_cell = board.vertex_cells[vertex_id]
+            vertex_cell.owner_id = owner_id
+            vertex_cell.building = BuildingType.settlement
+            neighbour_id = random.choice(vertex_cell.neighbor_vertexes)
+            vertex_cell.roads[neighbour_id] = owner_id
+            board.vertex_cells[neighbour_id].roads[vertex_id] = owner_id
+            for hex_id in vertex_cell.neighbor_hexes:
+                resource_type = board.hex_cells[hex_id].resource_type
+                if resource_type == ResourceType.desert:
+                    continue
+                board.players[owner_id-1].resources[resource_type] += 1
+                board.bank.resources[resource_type] -= 1
+        return board
+
+
+
+def print_resources(board):
+    print(f'Bank resources: {[f"{k.name}: {v}" for k, v in board.bank.resources.items()]}')
+    for id, player in board.players.items():
+        print(f'Player {id} resources: {[f"{k.name}: {v}" for k, v in player.resources.items()]}')
+
+
 """
 TODO:
 ALlow users to interact with the board.
@@ -423,57 +601,6 @@ dev cards - largest army, longest road, victory point
 trading
 """
 
-def print_resources(board):
-    print(f'Bank resources: {[f"{k.name}: {v}" for k, v in board.bank.resources.items()]}')
-    for id, player in board.players.items():
-        print(f'Player {id} resources: {[f"{k.name}: {v}" for k, v in player.resources.items()]}')
-
-
-def example_settlement_cutoff_board():
-    board = BoardUtils.setup_board()
-
-    ## Testing road length and settlment placement for road cut off
-    # Player 1
-    vertex_cell = board.vertex_cells[32]
-    vertex_cell.owner_id = 1
-    vertex_cell.building = BuildingType.settlement
-    vertex_cell.roads[38] = 1
-    board.vertex_cells[38].roads[32] = 1
-
-    board.vertex_cells[38].roads[37] = 1
-    board.vertex_cells[37].roads[38] = 1
-
-    vertex_cell = board.vertex_cells[37]
-    vertex_cell.owner_id = 1
-    vertex_cell.building = BuildingType.settlement
-    #Player 2
-    vertex_cell = board.vertex_cells[25]
-    vertex_cell.owner_id = 2
-    vertex_cell.building = BuildingType.settlement
-    from itertools import pairwise
-    for start, end in pairwise([25, 31, 37, 43]):
-        board.vertex_cells[start].roads[end] = 2
-        board.vertex_cells[end].roads[start] = 2
-    return board
-
-def example_highest_production_first_spots():
-    board = BoardUtils.setup_board()
-    for owner_id in range(1, 5):
-        vertex_id = BoardUtils.highest_production_spot(board)
-        vertex_cell = board.vertex_cells[vertex_id]
-        vertex_cell.owner_id = owner_id
-        vertex_cell.building = BuildingType.settlement
-        neighbour_id = random.choice(vertex_cell.neighbor_vertexes)
-        vertex_cell.roads[neighbour_id] = owner_id
-        board.vertex_cells[neighbour_id].roads[vertex_id] = owner_id
-        for hex_id in vertex_cell.neighbor_hexes:
-            resource_type = board.hex_cells[hex_id].resource_type
-            if resource_type == ResourceType.desert:
-                continue
-            board.players[owner_id-1].resources[resource_type] += 1
-            board.bank.resources[resource_type] -= 1
-    return board
-
 """
 API:
 actionable moves. Return a list of player ids with the thing each player can do
@@ -481,53 +608,29 @@ actionable moves. Return a list of player ids with the thing each player can do
 API interaction order:
 a) roll dice 
 -> backend picks up all resources. (frontend also given previous state so it can visualize)
--> player given option to place settlements etc.
+-> player given option to place settlements, roads, cities, buy dev cards.
+^ In the above the can also propose trades* (* leave to the later on to add in).
+
+Next steps:
+Allow the frontend to take the actions specificed in possible_next_actions, updating the resources store each time an action is taken.
 """
 
-def possible_next_actions(board, player_id):
-    actions = {'player_id' : player_id}
-    player_buildings = [v for v in board.vertex_cells.values() if v.owner_id == player_id]
-    cities = [b for b in player_buildings if b.building == BuildingType.city]
-    settlements = [b for b in player_buildings if b.building == BuildingType.settlement]
-    resources = board.players[player_id].resources
-    if len(cities) < 5 and resources[ResourceType.ore] >= 3 and resources[ResourceType.wheat] >= 5:
-        actions[BuildingType.city] = [v.unique_id for v in settlements]
 
-    valid_vertices = BoardUtils.valid_origin_vertices(board, player_id)
-
-    if len(settlements) < 5 and (resources[ResourceType.wood] > 0 and resources[ResourceType.brick] > 0 
-                    and resources[ResourceType.wheat] > 0 and resources[ResourceType.sheep] > 0):
-        all_valid_settlements = BoardUtils.valid_settlements(board)
-       
-        valid_settlement_spots = [v for v in all_valid_settlements if v in valid_vertices]
-        actions[BuildingType.settlement] = valid_settlement_spots
-
-    if resources[ResourceType.wood] > 0 and resources[ResourceType.brick] > 0:
-        possible_roads = []
-        for id in valid_vertices:
-            vertex = board.vertex_cells[id]
-
-            current_roads =  list(vertex.roads.keys())
-            for road_id in vertex.neighbor_vertexes:
-                if road_id not in current_roads:
-                    possible_roads.append((min(id, road_id), max(id, road_id)))
-        possible_roads = sorted(list(set(possible_roads)))
-        actions['roads'] = possible_roads
-    return actions
 
 if __name__ == "__main__":
     # board = BoardUtils.setup_board()
-    board = example_settlement_cutoff_board()
+    board = ExampleBoards.example_settlement_cutoff_board()
 
     dice1, dice2 = random.randint(1, 6), random.randint(1, 6)
     BoardUtils.collect_resources(board, dice1 + dice2)
     print_resources(board)
 
-    next_actions = possible_next_actions(board, 1)
-    print(next_actions)
-
-    next_actions = possible_next_actions(board, 2)
-    print(next_actions)
+    for player_id in [1, 2]:
+        next_actions = BoardUtils.possible_next_actions(board, player_id)
+        print(next_actions)
+        for start, end in next_actions['roads']:
+            board.vertex_cells[start].roads[end] = player_id
+            board.vertex_cells[end].roads[start] = player_id
 
     board_state = board.get_board_state()
     with open('board.json', 'w') as f:
