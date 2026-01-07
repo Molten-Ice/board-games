@@ -403,12 +403,13 @@ function drawBoard() {
         const v1 = gameState.board.vertices.find(v => v.id === road.v1);
         const v2 = gameState.board.vertices.find(v => v.id === road.v2);
         if (v1 && v2) {
+            // Vertices use same coordinate system as hexes in this implementation
             const [x1, y1] = axialToPixel(v1.q, v1.r, scale, centerX, centerY);
             const [x2, y2] = axialToPixel(v2.q, v2.r, scale, centerX, centerY);
 
             const player = gameState.players[road.owner];
             ctx.strokeStyle = player ? player.color : '#333';
-            ctx.lineWidth = 6;
+            ctx.lineWidth = 5;
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
@@ -425,7 +426,7 @@ function drawBoard() {
             ctx.fillStyle = player ? player.color : '#333';
 
             if (vertex.building === 'settlement') {
-                // Draw triangle
+                // Draw triangle (house shape)
                 ctx.beginPath();
                 ctx.moveTo(x, y - 10);
                 ctx.lineTo(x - 8, y + 8);
@@ -436,7 +437,7 @@ function drawBoard() {
                 ctx.lineWidth = 2;
                 ctx.stroke();
             } else if (vertex.building === 'city') {
-                // Draw square
+                // Draw square (larger building)
                 ctx.fillRect(x - 10, y - 10, 20, 20);
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 2;
@@ -450,6 +451,19 @@ function drawBoard() {
         highlightValidSettlements(ctx, scale, centerX, centerY);
     } else if (buildMode === 'road') {
         highlightValidRoads(ctx, scale, centerX, centerY);
+    }
+
+    // Highlight selected road start point
+    if (buildMode === 'road' && selectedRoadStart !== null) {
+        const startVertex = gameState.board.vertices.find(v => v.id === selectedRoadStart);
+        if (startVertex) {
+            const [x, y] = axialToPixel(startVertex.q, startVertex.r, scale, centerX, centerY);
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, 15, 0, Math.PI * 2);
+            ctx.stroke();
+        }
     }
 }
 
@@ -471,44 +485,58 @@ function drawHex(ctx, x, y, size, hex) {
     // Fill with resource color
     ctx.fillStyle = RESOURCE_COLORS[hex.resource_type] || '#c19a6b';
     ctx.fill();
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#2c3e50';
+    ctx.lineWidth = 1;
     ctx.stroke();
 
     // Draw number token
     if (hex.number_token > 0) {
+        // White circle background
         ctx.fillStyle = '#fff';
         ctx.beginPath();
-        ctx.arc(x, y, size * 0.4, 0, Math.PI * 2);
+        ctx.arc(x, y, size * 0.45, 0, Math.PI * 2);
         ctx.fill();
         ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
         ctx.stroke();
 
+        // Number
         ctx.fillStyle = hex.number_token === 6 || hex.number_token === 8 ? '#e74c3c' : '#000';
-        ctx.font = 'bold 20px Arial';
+        ctx.font = 'bold 22px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(hex.number_token, x, y);
+        ctx.fillText(hex.number_token, x, y - 2);
 
-        // Draw pips
+        // Draw pips (probability dots)
         const pips = getPipCount(hex.number_token);
         if (pips > 0) {
             ctx.fillStyle = hex.number_token === 6 || hex.number_token === 8 ? '#e74c3c' : '#000';
+            const pipY = y + 14;
+            const totalWidth = (pips - 1) * 8;
+            const startX = x - totalWidth / 2;
+
             for (let i = 0; i < pips; i++) {
                 ctx.beginPath();
-                ctx.arc(x - (pips - 1) * 4 + i * 8, y + 15, 2, 0, Math.PI * 2);
+                ctx.arc(startX + i * 8, pipY, 2.5, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
     }
 
-    // Draw robber
+    // Draw robber (simple black circle with R)
     if (hex.has_robber) {
+        // Black circle
         ctx.fillStyle = '#000';
-        ctx.font = 'bold 24px Arial';
+        ctx.beginPath();
+        ctx.arc(x, y + size * 0.7, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // White R
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('🛡️', x, y - 20);
+        ctx.fillText('R', x, y + size * 0.7);
     }
 }
 
@@ -530,10 +558,20 @@ function axialToPixel(q, r, size, centerX, centerY) {
 }
 
 function highlightValidSettlements(ctx, scale, centerX, centerY) {
-    // This would need to get valid settlement locations from the game state
-    // For now, just highlight all empty vertices
+    if (!gameState || !gameState.board) return;
+
+    const myPlayer = gameState.players[myPlayerId];
+    if (!myPlayer) return;
+
+    // Get valid settlement locations from next_actions
+    const nextActions = gameState.next_actions?.[myPlayerId];
+    if (!nextActions || !nextActions.settlement) return;
+
+    const validSettlements = nextActions.settlement;
+
+    // Highlight each valid settlement location
     gameState.board.vertices.forEach(vertex => {
-        if (!vertex.building) {
+        if (validSettlements.includes(vertex.id)) {
             const [x, y] = axialToPixel(vertex.q, vertex.r, scale, centerX, centerY);
             ctx.strokeStyle = '#48bb78';
             ctx.lineWidth = 3;
@@ -545,8 +583,54 @@ function highlightValidSettlements(ctx, scale, centerX, centerY) {
 }
 
 function highlightValidRoads(ctx, scale, centerX, centerY) {
-    // Highlight valid road locations
-    // This would need proper validation from game state
+    if (!gameState || !gameState.board) return;
+
+    const myPlayer = gameState.players[myPlayerId];
+    if (!myPlayer) return;
+
+    // Get valid road pairs from next_actions if available
+    const nextActions = gameState.next_actions?.[myPlayerId];
+    if (!nextActions || !nextActions.roads) return;
+
+    const validRoads = nextActions.roads;
+
+    if (!selectedRoadStart) {
+        // Highlight all valid starting vertices
+        const validStarts = new Set();
+        validRoads.forEach(([v1, v2]) => {
+            validStarts.add(v1);
+            validStarts.add(v2);
+        });
+
+        gameState.board.vertices.forEach(vertex => {
+            if (validStarts.has(vertex.id)) {
+                const [x, y] = axialToPixel(vertex.q, vertex.r, scale, centerX, centerY);
+                ctx.strokeStyle = '#48bb78';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(x, y, 12, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        });
+    } else {
+        // Highlight valid end vertices for selected start
+        const validEnds = new Set();
+        validRoads.forEach(([v1, v2]) => {
+            if (v1 === selectedRoadStart) validEnds.add(v2);
+            if (v2 === selectedRoadStart) validEnds.add(v1);
+        });
+
+        gameState.board.vertices.forEach(vertex => {
+            if (validEnds.has(vertex.id)) {
+                const [x, y] = axialToPixel(vertex.q, vertex.r, scale, centerX, centerY);
+                ctx.strokeStyle = '#48bb78';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(x, y, 12, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        });
+    }
 }
 
 // Game actions
@@ -606,8 +690,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!gameState || gameState.current_player !== myPlayerId) return;
 
         const rect = canvas.getBoundingClientRect();
-        const clickX = event.clientX - rect.left;
-        const clickY = event.clientY - rect.top;
+
+        // Account for CSS scaling
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const clickX = (event.clientX - rect.left) * scaleX;
+        const clickY = (event.clientY - rect.top) * scaleY;
 
         const scale = 35;
         const centerX = canvas.width / 2;
