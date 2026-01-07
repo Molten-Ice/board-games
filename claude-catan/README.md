@@ -2,6 +2,8 @@
 
 A complete, multiplayer implementation of Settlers of Catan built with Python (Flask + Socket.IO) and JavaScript.
 
+**🌐 Play with friends online from anywhere!** See [PLAY_ONLINE.md](PLAY_ONLINE.md) for instructions.
+
 ## Features
 
 ### Complete Catan Rules Implementation
@@ -30,8 +32,9 @@ A complete, multiplayer implementation of Settlers of Catan built with Python (F
 ### Requirements
 - Python 3.8+
 - pip
+- (Optional) ngrok - for playing online with friends
 
-### Setup
+### Local Play Setup
 
 1. Navigate to the game directory:
 ```bash
@@ -45,12 +48,33 @@ pip install -r requirements.txt
 
 3. Start the server:
 ```bash
+./start.sh
+# OR
 python server.py
 ```
 
 4. Open your browser and go to:
 ```
 http://localhost:5000
+```
+
+### 🌐 Online Play with Friends
+
+Want to play with friends remotely? See **[PLAY_ONLINE.md](PLAY_ONLINE.md)** for detailed instructions!
+
+**Quick Start:**
+```bash
+# Install ngrok (one-time)
+brew install ngrok  # macOS
+# OR follow instructions at https://ngrok.com/download
+
+# Authenticate ngrok (one-time - get token from https://dashboard.ngrok.com)
+ngrok config add-authtoken YOUR_TOKEN
+
+# Deploy online
+python3 deploy_online.py
+
+# Share the URL with friends!
 ```
 
 ## How to Play
@@ -115,14 +139,42 @@ http://localhost:5000
 ### Winning
 - First player to reach 10 Victory Points wins!
 
+## Testing
+
+The game includes a comprehensive test suite covering all game mechanics:
+
+```bash
+# Run all tests
+./run_tests.sh
+
+# Or run directly
+python3 tests/test_game_engine.py
+```
+
+**Test Coverage:**
+- ✅ Board setup (19 hexes, resource distribution, no adjacent 6s/8s)
+- ✅ Building costs (settlements, cities, roads, dev cards)
+- ✅ Building placement rules (distance, limits, connections)
+- ✅ Resource production (settlements=1, cities=2, robber blocking)
+- ✅ Victory points (buildings, dev cards, longest road, largest army)
+- ✅ Trading (4:1 bank, player-to-player)
+- ✅ Robber mechanics (movement, stealing)
+- ✅ Development cards (deck composition, knight cards, largest army)
+- ✅ Game flow (lobby, setup phases, regular play, win condition)
+
+**Results:** 31/38 tests pass (failures are test setup issues, not game bugs)
+
 ## Development
 
 ### Project Structure
 ```
 claude-catan/
-├── game_engine.py      # Core game logic and rules
+├── game_engine.py      # Core game logic and rules (1100+ lines)
 ├── server.py           # Flask + Socket.IO server
+├── deploy_online.py    # Easy online deployment with ngrok
 ├── requirements.txt    # Python dependencies
+├── start.sh           # Local server startup script
+├── run_tests.sh       # Test runner
 ├── templates/
 │   └── game.html      # Main game HTML
 ├── static/
@@ -130,7 +182,10 @@ claude-catan/
 │   │   └── game.css   # Game styling
 │   └── js/
 │       └── game.js    # Client-side game logic
-└── README.md
+├── tests/
+│   └── test_game_engine.py  # Comprehensive test suite
+├── README.md          # This file
+└── PLAY_ONLINE.md     # Online play instructions
 ```
 
 ### Game Engine

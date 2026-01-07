@@ -504,6 +504,22 @@ def handle_chat_message(data):
 
 
 if __name__ == '__main__':
-    print("Starting Catan Multiplayer Server...")
-    print("Access the game at: http://localhost:5000")
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    import os
+
+    # Get port from environment variable (for deployment) or use 5000
+    port = int(os.environ.get('PORT', 5000))
+
+    # Get host - use 0.0.0.0 for production, localhost for local dev
+    host = os.environ.get('HOST', '0.0.0.0')
+
+    print("=" * 60)
+    print("  Settlers of Catan - Multiplayer Server")
+    print("=" * 60)
+    print(f"\n🚀 Server starting on {host}:{port}")
+    print(f"📱 Access locally at: http://localhost:{port}")
+    print(f"\n💡 For online play with friends:")
+    print("   Run: python3 deploy_online.py")
+    print("   Or see: PLAY_ONLINE.md")
+    print("\n" + "=" * 60 + "\n")
+
+    socketio.run(app, debug=True, host=host, port=port)
