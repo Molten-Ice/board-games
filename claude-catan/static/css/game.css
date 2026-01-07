@@ -1,0 +1,540 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Lobby Screen */
+.lobby-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 100%;
+}
+
+.lobby-container h1 {
+    text-align: center;
+    color: #667eea;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+.lobby-section {
+    margin-bottom: 30px;
+}
+
+.lobby-section h2 {
+    color: #764ba2;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.divider {
+    text-align: center;
+    color: #999;
+    font-weight: bold;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #48bb78;
+    color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #38a169;
+}
+
+.btn-danger {
+    background: #f56565;
+    color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #e53e3e;
+}
+
+.btn-success {
+    background: #48bb78;
+    color: white;
+}
+
+#lobby-players {
+    background: #f7fafc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.player-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-color {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #333;
+}
+
+/* Game Screen */
+.game-container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.top-bar {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.game-info {
+    display: flex;
+    gap: 20px;
+    font-weight: bold;
+}
+
+.dice-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.die {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border: 3px solid #333;
+    border-radius: 8px;
+    text-align: center;
+    line-height: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.main-area {
+    display: flex;
+    gap: 20px;
+}
+
+.board-container {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+#game-board {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.side-panel {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.panel-section {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.panel-section h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+/* Players List */
+.player-card {
+    background: #f7fafc;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.player-card.current-turn {
+    border-left-color: #48bb78;
+    background: #f0fff4;
+}
+
+.player-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.player-stats {
+    display: flex;
+    gap: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Resources */
+#resource-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.resource-card {
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+}
+
+.resource-card.wood {
+    background: #2d5016;
+}
+
+.resource-card.brick {
+    background: #9c4221;
+}
+
+.resource-card.wheat {
+    background: #f1c40f;
+    color: #333;
+}
+
+.resource-card.sheep {
+    background: #95a5a6;
+}
+
+.resource-card.ore {
+    background: #566573;
+}
+
+/* Dev Cards */
+#dev-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dev-card {
+    background: #f7fafc;
+    padding: 10px;
+    border-radius: 6px;
+    border: 2px solid #667eea;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dev-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Actions */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-btn {
+    position: relative;
+    padding: 12px;
+    text-align: left;
+}
+
+.cost {
+    display: block;
+    font-size: 0.8em;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+/* Chat */
+.chat-section {
+    max-height: 300px;
+}
+
+#chat-messages {
+    height: 200px;
+    overflow-y: auto;
+    background: #f7fafc;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.chat-message {
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.chat-message .player-name {
+    font-weight: bold;
+    color: #667eea;
+}
+
+.chat-input {
+    display: flex;
+    gap: 8px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 8px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+/* Trade Modal */
+.trade-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: #f7fafc;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.tab-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.trade-tab {
+    display: none;
+}
+
+.trade-tab.active {
+    display: block;
+}
+
+.trade-section {
+    margin-bottom: 20px;
+}
+
+.resource-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.resource-select {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: #f7fafc;
+    border-radius: 6px;
+}
+
+.resource-select label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.resource-select input {
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 2000;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.success {
+    border-left: 4px solid #48bb78;
+}
+
+.notification.error {
+    border-left: 4px solid #f56565;
+}
+
+.notification.info {
+    border-left: 4px solid #667eea;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .main-area {
+        flex-direction: column;
+    }
+
+    .side-panel {
+        width: 100%;
+    }
+}

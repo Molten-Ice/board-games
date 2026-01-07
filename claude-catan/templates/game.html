@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settlers of Catan - Multiplayer</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+</head>
+<body>
+    <!-- Lobby Screen -->
+    <div id="lobby-screen" class="screen active">
+        <div class="lobby-container">
+            <h1>Settlers of Catan</h1>
+            <div class="lobby-section">
+                <h2>Join or Create a Game</h2>
+                <div class="form-group">
+                    <label for="player-name-input">Your Name:</label>
+                    <input type="text" id="player-name-input" placeholder="Enter your name" value="Player">
+                </div>
+                <div class="button-group">
+                    <button id="create-game-btn" class="btn btn-primary">Create New Game</button>
+                    <div class="divider">OR</div>
+                    <input type="text" id="game-id-input" placeholder="Enter Game ID">
+                    <button id="join-game-btn" class="btn btn-secondary">Join Game</button>
+                </div>
+            </div>
+
+            <div id="game-lobby" class="lobby-section" style="display: none;">
+                <h2>Game Lobby - <span id="lobby-game-id"></span></h2>
+                <div id="lobby-players"></div>
+                <div class="button-group">
+                    <button id="start-game-btn" class="btn btn-primary">Start Game</button>
+                    <button id="leave-lobby-btn" class="btn btn-danger">Leave</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="game-container">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="game-info">
+                    <span id="game-id-display"></span>
+                    <span id="current-phase"></span>
+                    <span id="current-turn"></span>
+                </div>
+                <div class="dice-area">
+                    <button id="roll-dice-btn" class="btn btn-primary" disabled>Roll Dice</button>
+                    <div id="dice-display">
+                        <span class="die" id="die1">?</span>
+                        <span class="die" id="die2">?</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Game Area -->
+            <div class="main-area">
+                <!-- Board -->
+                <div class="board-container">
+                    <canvas id="game-board" width="900" height="800"></canvas>
+                </div>
+
+                <!-- Side Panel -->
+                <div class="side-panel">
+                    <!-- Players -->
+                    <div class="panel-section players-section">
+                        <h3>Players</h3>
+                        <div id="players-list"></div>
+                    </div>
+
+                    <!-- Your Hand -->
+                    <div class="panel-section hand-section">
+                        <h3>Your Resources</h3>
+                        <div id="resource-cards"></div>
+                        <h3>Your Dev Cards (<span id="dev-card-count">0</span>)</h3>
+                        <div id="dev-cards"></div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="panel-section actions-section">
+                        <h3>Actions</h3>
+                        <div class="action-buttons">
+                            <button id="build-settlement-btn" class="btn action-btn" disabled>
+                                Build Settlement
+                                <span class="cost">W B Wh S</span>
+                            </button>
+                            <button id="build-city-btn" class="btn action-btn" disabled>
+                                Build City
+                                <span class="cost">3O 2Wh</span>
+                            </button>
+                            <button id="build-road-btn" class="btn action-btn" disabled>
+                                Build Road
+                                <span class="cost">W B</span>
+                            </button>
+                            <button id="buy-dev-card-btn" class="btn action-btn" disabled>
+                                Buy Dev Card
+                                <span class="cost">O S Wh</span>
+                            </button>
+                            <button id="trade-btn" class="btn action-btn" disabled>Trade</button>
+                            <button id="end-turn-btn" class="btn btn-success" disabled>End Turn</button>
+                        </div>
+                    </div>
+
+                    <!-- Chat -->
+                    <div class="panel-section chat-section">
+                        <h3>Chat</h3>
+                        <div id="chat-messages"></div>
+                        <div class="chat-input">
+                            <input type="text" id="chat-input" placeholder="Type a message...">
+                            <button id="send-chat-btn" class="btn btn-small">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Modal -->
+    <div id="trade-modal" class="modal">
+        <div class="modal-content">
+            <h2>Trade</h2>
+            <div class="trade-tabs">
+                <button class="tab-btn active" data-tab="bank">Bank Trade</button>
+                <button class="tab-btn" data-tab="player">Player Trade</button>
+            </div>
+
+            <!-- Bank Trade -->
+            <div id="bank-trade-tab" class="trade-tab active">
+                <div class="trade-section">
+                    <h3>Give (4:1)</h3>
+                    <div id="bank-give-resources"></div>
+                </div>
+                <div class="trade-section">
+                    <h3>Receive</h3>
+                    <div id="bank-receive-resources"></div>
+                </div>
+                <button id="execute-bank-trade-btn" class="btn btn-primary">Trade</button>
+            </div>
+
+            <!-- Player Trade -->
+            <div id="player-trade-tab" class="trade-tab">
+                <div class="trade-section">
+                    <h3>Offer</h3>
+                    <div id="player-offer-resources"></div>
+                </div>
+                <div class="trade-section">
+                    <h3>Request</h3>
+                    <div id="player-request-resources"></div>
+                </div>
+                <button id="propose-trade-btn" class="btn btn-primary">Propose Trade</button>
+
+                <div id="trade-responses" style="display: none;">
+                    <h3>Responses</h3>
+                    <div id="trade-response-list"></div>
+                    <button id="execute-player-trade-btn" class="btn btn-success">Complete Trade</button>
+                    <button id="cancel-trade-btn" class="btn btn-danger">Cancel</button>
+                </div>
+
+                <div id="incoming-trade" style="display: none;">
+                    <h3>Trade Proposal</h3>
+                    <div id="incoming-trade-details"></div>
+                    <button id="accept-trade-btn" class="btn btn-success">Accept</button>
+                    <button id="decline-trade-btn" class="btn btn-danger">Decline</button>
+                </div>
+            </div>
+
+            <button class="modal-close">&times;</button>
+        </div>
+    </div>
+
+    <!-- Robber Modal -->
+    <div id="robber-modal" class="modal">
+        <div class="modal-content">
+            <h2>Move the Robber</h2>
+            <p>Click on a hex tile to move the robber</p>
+            <div id="steal-from-section" style="display: none;">
+                <h3>Steal from:</h3>
+                <div id="steal-options"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discard Modal -->
+    <div id="discard-modal" class="modal">
+        <div class="modal-content">
+            <h2>Discard Resources</h2>
+            <p>You must discard <span id="discard-amount">0</span> resources</p>
+            <div id="discard-resources"></div>
+            <button id="confirm-discard-btn" class="btn btn-primary">Discard</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+</body>
+</html>
