@@ -1,0 +1,279 @@
+.restaurant-detail-page {
+  padding-top: 70px;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.back-btn {
+  position: fixed;
+  top: 90px;
+  left: 20px;
+  background: white;
+  border: 2px solid #667eea;
+  color: #667eea;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.back-btn:hover {
+  background: #667eea;
+  color: white;
+}
+
+.restaurant-hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 20px;
+}
+
+.restaurant-hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.restaurant-hero h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.restaurant-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+}
+
+.restaurant-meta span,
+.restaurant-meta a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  text-decoration: none;
+}
+
+.restaurant-meta a:hover {
+  text-decoration: underline;
+}
+
+.restaurant-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.restaurant-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.info-section {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.info-section h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.info-section p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.info-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.info-item strong {
+  min-width: 120px;
+  color: #333;
+}
+
+.rating-form {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.rating-form h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.star-rating {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.star-rating svg {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.star-filled {
+  color: #fbbf24;
+}
+
+.star-empty {
+  color: #e5e7eb;
+}
+
+.star-rating svg:hover {
+  transform: scale(1.1);
+}
+
+.rating-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-bottom: 20px;
+}
+
+.rating-form textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.menu-section {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.menu-section h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 32px;
+}
+
+.menu-category {
+  margin-bottom: 40px;
+}
+
+.menu-category h3 {
+  font-size: 1.5rem;
+  color: #667eea;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #667eea;
+}
+
+.menu-items {
+  display: grid;
+  gap: 20px;
+}
+
+.menu-item {
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  transition: background 0.3s ease;
+}
+
+.menu-item:hover {
+  background: #f3f4f6;
+}
+
+.menu-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.menu-item-header h4 {
+  font-size: 1.2rem;
+  color: #333;
+  flex: 1;
+}
+
+.menu-item-price {
+  color: #667eea;
+  font-size: 1.2rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.menu-item-description {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.dietary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dietary-tag {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+  .back-btn {
+    top: 80px;
+    left: 12px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .restaurant-hero h1 {
+    font-size: 2rem;
+  }
+
+  .restaurant-hero-content {
+    padding: 0;
+  }
+
+  .restaurant-actions {
+    flex-direction: column;
+  }
+
+  .info-section,
+  .menu-section,
+  .rating-form {
+    padding: 20px;
+  }
+
+  .menu-item-header {
+    flex-direction: column;
+  }
+}
