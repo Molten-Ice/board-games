@@ -16,7 +16,8 @@ import base64
 
 # Import models and utilities
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'enhanced_backend'))
+# Add parent directory to import from backend folder
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from models import (
     db, User, Restaurant, Menu, MenuItem, Cuisine, DietaryPreference,
     Rating, RestaurantVisit, Favorite
@@ -25,8 +26,7 @@ from recommender import RestaurantRecommender
 from scraper import ReadingRestaurantScraper
 
 # Import menu processor from original backend
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
-from menu_processor import MenuProcessor
+from backend.menu_processor import MenuProcessor
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -581,6 +581,40 @@ def get_user_favorites():
     except Exception as e:
         print(f"Get favorites error: {str(e)}")
         return jsonify({'error': 'Failed to get favorites'}), 500
+
+@app.route('/api/restaurants/<int:restaurant_id>/visit', methods=['POST'])
+@jwt_required()
+def mark_restaurant_visited(restaurant_id):
+    """Mark a restaurant as visited"""
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        restaurant = Restaurant.query.get(restaurant_id)
+
+        if not user or not restaurant:
+            return jsonify({'error': 'User or restaurant not found'}), 404
+
+        # Check if already visited
+        visit = RestaurantVisit.query.filter_by(
+            user_id=user.id,
+            restaurant_id=restaurant.id
+        ).first()
+
+        if not visit:
+            # Add visit
+            visit = RestaurantVisit(user_id=user.id, restaurant_id=restaurant.id)
+            db.session.add(visit)
+            db.session.commit()
+
+        return jsonify({
+            'has_visited': True,
+            'message': 'Restaurant marked as visited'
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Visit error: {str(e)}")
+        return jsonify({'error': 'Failed to mark as visited'}), 500
 
 # ============================================================================
 # CUISINE & DIETARY ENDPOINTS

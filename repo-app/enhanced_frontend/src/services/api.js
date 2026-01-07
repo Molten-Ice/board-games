@@ -133,6 +133,26 @@ export const restaurantAPI = {
     return response.data;
   },
 
+  addFavorite: async (id) => {
+    const response = await api.post(`/restaurants/${id}/favorite`);
+    return response.data;
+  },
+
+  removeFavorite: async (id) => {
+    const response = await api.post(`/restaurants/${id}/favorite`);
+    return response.data;
+  },
+
+  markVisited: async (id) => {
+    const response = await api.post(`/restaurants/${id}/visit`);
+    return response.data;
+  },
+
+  getFavorites: async () => {
+    const response = await api.get('/user/favorites');
+    return response.data;
+  },
+
   getSimilarRestaurants: async (id, limit = 5) => {
     const response = await api.get(`/restaurants/${id}/similar`, { params: { limit } });
     return response.data;
@@ -167,6 +187,23 @@ export const menuAPI = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+    });
+    return response.data;
+  },
+
+  getMenu: async (restaurantId) => {
+    const response = await api.get(`/restaurants/${restaurantId}/menu`);
+    return response.data;
+  },
+};
+
+// Rating API
+export const ratingAPI = {
+  submitRating: async (ratingData) => {
+    const { restaurant_id, rating, review } = ratingData;
+    const response = await api.post(`/restaurants/${restaurant_id}/rate`, {
+      rating: rating,
+      review_text: review,
     });
     return response.data;
   },
