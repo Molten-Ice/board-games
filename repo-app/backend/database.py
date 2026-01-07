@@ -22,15 +22,20 @@ class Menu(db.Model):
 
     def to_dict(self):
         """Convert menu to dictionary"""
+        try:
+            processed_data = json.loads(self.processed_data) if self.processed_data else {}
+        except (json.JSONDecodeError, TypeError):
+            processed_data = {}
+
         return {
             'id': self.id,
             'restaurant_name': self.restaurant_name,
             'image_path': self.image_path,
             'raw_text': self.raw_text,
-            'processed_data': json.loads(self.processed_data) if self.processed_data else {},
+            'processed_data': processed_data,
             'is_favorite': self.is_favorite,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat(),
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'item_count': len(self.items)
         }
 
@@ -49,13 +54,18 @@ class MenuItem(db.Model):
 
     def to_dict(self):
         """Convert menu item to dictionary"""
+        try:
+            dietary_tags = json.loads(self.dietary_tags) if self.dietary_tags else []
+        except (json.JSONDecodeError, TypeError):
+            dietary_tags = []
+
         return {
             'id': self.id,
             'menu_id': self.menu_id,
             'name': self.name,
-            'description': self.description,
-            'price': self.price,
-            'category': self.category,
-            'dietary_tags': json.loads(self.dietary_tags) if self.dietary_tags else [],
-            'created_at': self.created_at.isoformat()
+            'description': self.description or '',
+            'price': self.price or '',
+            'category': self.category or 'Other',
+            'dietary_tags': dietary_tags,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }

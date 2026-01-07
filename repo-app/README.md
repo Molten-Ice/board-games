@@ -79,6 +79,20 @@ repo-app/
 - Node.js 14+
 - Tesseract OCR
 
+### Validate Your Setup
+
+Before installing, check if you have all prerequisites:
+
+```bash
+python check_setup.py
+```
+
+This will verify:
+- ✅ Python 3.8+ is installed
+- ✅ Node.js 14+ is installed
+- ✅ Tesseract OCR is installed
+- ✅ Directory structure is correct
+
 ### Install Tesseract OCR
 
 **macOS:**
@@ -172,6 +186,38 @@ Frontend will run on `http://localhost:3000`
 3. Toggle "Favorites Only" to see starred menus
 4. Click a menu to view it
 5. Delete menus by clicking trash icon (requires confirmation)
+
+## Testing
+
+### Automated Testing
+
+Test the core functionality with our automated test script:
+
+```bash
+# Make sure backend is running first
+cd backend
+python app.py
+
+# In another terminal, run the test
+cd repo-app
+python test_functionality.py
+```
+
+The test script will:
+- ✅ Verify API is running
+- ✅ Create a test menu image
+- ✅ Upload and process it
+- ✅ Verify extraction results
+- ✅ Test menu retrieval
+
+### Manual Testing
+
+See [TESTING.md](TESTING.md) for comprehensive testing guide including:
+- Manual test cases
+- Browser compatibility testing
+- OCR accuracy testing
+- Performance testing
+- Debugging tips
 
 ## API Endpoints
 

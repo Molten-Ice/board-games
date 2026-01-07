@@ -40,12 +40,11 @@ def health_check():
 def process_menu():
     """Process a menu image and extract items"""
     try:
-        # Get image from request
-        if 'image' not in request.files and 'imageData' not in request.json:
-            return jsonify({'error': 'No image provided'}), 400
+        filepath = None
+        restaurant_name = 'Unknown Restaurant'
 
-        # Handle file upload
-        if 'image' in request.files:
+        # Check if it's a file upload (multipart/form-data)
+        if request.files and 'image' in request.files:
             file = request.files['image']
             if file.filename == '':
                 return jsonify({'error': 'No selected file'}), 400
@@ -55,9 +54,13 @@ def process_menu():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-        # Handle base64 image data
-        elif 'imageData' in request.json:
+            # Get restaurant name from form
+            restaurant_name = request.form.get('restaurantName', 'Unknown Restaurant')
+
+        # Check if it's base64 image data (JSON)
+        elif request.is_json and request.json and 'imageData' in request.json:
             image_data = request.json['imageData']
+
             # Remove data URL prefix if present
             if 'base64,' in image_data:
                 image_data = image_data.split('base64,')[1]
@@ -69,49 +72,69 @@ def process_menu():
             with open(filepath, 'wb') as f:
                 f.write(base64.b64decode(image_data))
 
-        # Get optional parameters
-        restaurant_name = request.form.get('restaurantName') or request.json.get('restaurantName', 'Unknown Restaurant')
+            # Get restaurant name from JSON
+            restaurant_name = request.json.get('restaurantName', 'Unknown Restaurant')
+
+        else:
+            return jsonify({'error': 'No image provided'}), 400
+
+        if not filepath:
+            return jsonify({'error': 'Failed to save image'}), 500
 
         # Process the menu image
+        print(f"Processing menu image: {filepath} for restaurant: {restaurant_name}")
         result = menu_processor.process_menu_image(filepath, restaurant_name)
 
         if not result['success']:
-            return jsonify({'error': result.get('error', 'Processing failed')}), 500
+            error_msg = result.get('error', 'Processing failed')
+            print(f"Menu processing failed: {error_msg}")
+            return jsonify({'error': error_msg}), 500
+
+        print(f"Successfully extracted {len(result['menu_data'].get('items', []))} items from menu")
 
         # Save to database
-        menu = Menu(
-            restaurant_name=restaurant_name,
-            image_path=filepath,
-            raw_text=result.get('raw_text', ''),
-            processed_data=json.dumps(result['menu_data'])
-        )
-        db.session.add(menu)
-        db.session.flush()
-
-        # Save menu items
-        for item_data in result['menu_data'].get('items', []):
-            menu_item = MenuItem(
-                menu_id=menu.id,
-                name=item_data['name'],
-                description=item_data.get('description', ''),
-                price=item_data.get('price', ''),
-                category=item_data.get('category', 'Other'),
-                dietary_tags=json.dumps(item_data.get('dietary_tags', []))
+        try:
+            menu = Menu(
+                restaurant_name=restaurant_name,
+                image_path=filepath,
+                raw_text=result.get('raw_text', ''),
+                processed_data=json.dumps(result['menu_data'])
             )
-            db.session.add(menu_item)
+            db.session.add(menu)
+            db.session.flush()
 
-        db.session.commit()
+            # Save menu items
+            for item_data in result['menu_data'].get('items', []):
+                menu_item = MenuItem(
+                    menu_id=menu.id,
+                    name=item_data['name'],
+                    description=item_data.get('description', ''),
+                    price=item_data.get('price', ''),
+                    category=item_data.get('category', 'Other'),
+                    dietary_tags=json.dumps(item_data.get('dietary_tags', []))
+                )
+                db.session.add(menu_item)
 
-        # Return processed menu
-        return jsonify({
-            'success': True,
-            'menu_id': menu.id,
-            'menu_data': result['menu_data'],
-            'raw_text': result.get('raw_text', '')
-        })
+            db.session.commit()
+            print(f"Successfully saved menu to database with ID: {menu.id}")
+
+            # Return processed menu
+            return jsonify({
+                'success': True,
+                'menu_id': menu.id,
+                'menu_data': result['menu_data'],
+                'raw_text': result.get('raw_text', '')
+            })
+
+        except Exception as db_error:
+            db.session.rollback()
+            print(f"Database error: {str(db_error)}")
+            return jsonify({'error': f'Database error: {str(db_error)}'}), 500
 
     except Exception as e:
         print(f"Error processing menu: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/menus', methods=['GET'])
