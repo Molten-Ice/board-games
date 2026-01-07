@@ -9,10 +9,12 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, get_jwt
 )
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import os
 import json
 import base64
+import re
 
 # Import models and utilities
 import sys
@@ -27,6 +29,51 @@ from scraper import ReadingRestaurantScraper
 
 # Import menu processor from original backend
 from backend.menu_processor import MenuProcessor
+
+# ============================================================================
+# VALIDATION UTILITIES
+# ============================================================================
+
+def validate_email(email):
+    """Validate email format"""
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(email_regex, email) is not None
+
+def validate_password_strength(password):
+    """
+    Validate password strength
+    Returns (is_valid, error_message)
+    """
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters"
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain at least one uppercase letter"
+    if not re.search(r'[a-z]', password):
+        return False, "Password must contain at least one lowercase letter"
+    if not re.search(r'\d', password):
+        return False, "Password must contain at least one number"
+    return True, None
+
+def validate_username(username):
+    """Validate username format"""
+    if len(username) < 3 or len(username) > 50:
+        return False, "Username must be between 3 and 50 characters"
+    if not re.match(r'^[a-zA-Z0-9_-]+$', username):
+        return False, "Username can only contain letters, numbers, underscores, and hyphens"
+    return True, None
+
+def allowed_file(filename):
+    """Check if file extension is allowed"""
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def sanitize_filename(filename):
+    """Sanitize filename for safe storage"""
+    # Use werkzeug's secure_filename and add timestamp
+    base = secure_filename(filename)
+    name, ext = os.path.splitext(base)
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    return f"{timestamp}_{name}{ext}"
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -90,23 +137,35 @@ def register():
             if not data.get(field):
                 return jsonify({'error': f'{field} is required'}), 400
 
+        # Validate email format
+        email = data['email'].strip().lower()
+        if not validate_email(email):
+            return jsonify({'error': 'Invalid email format'}), 400
+
+        # Validate username
+        username = data['username'].strip()
+        is_valid, error_msg = validate_username(username)
+        if not is_valid:
+            return jsonify({'error': error_msg}), 400
+
         # Check if user already exists
-        if User.query.filter_by(email=data['email']).first():
+        if User.query.filter_by(email=email).first():
             return jsonify({'error': 'Email already registered'}), 400
 
-        if User.query.filter_by(username=data['username']).first():
+        if User.query.filter_by(username=username).first():
             return jsonify({'error': 'Username already taken'}), 400
 
         # Validate password strength
         password = data['password']
-        if len(password) < 8:
-            return jsonify({'error': 'Password must be at least 8 characters'}), 400
+        is_valid, error_msg = validate_password_strength(password)
+        if not is_valid:
+            return jsonify({'error': error_msg}), 400
 
         # Create new user
         user = User(
-            email=data['email'].lower().strip(),
-            username=data['username'].strip(),
-            display_name=data.get('display_name', data['username'])
+            email=email,
+            username=username,
+            display_name=data.get('display_name', username)
         )
         user.set_password(password)
 
@@ -474,10 +533,30 @@ def rate_restaurant(restaurant_id):
             return jsonify({'error': 'User or restaurant not found'}), 404
 
         data = request.get_json()
-        rating_value = float(data.get('rating', 0))
+
+        # Validate rating value
+        try:
+            rating_value = float(data.get('rating', 0))
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid rating value'}), 400
 
         if rating_value < 1 or rating_value > 5:
             return jsonify({'error': 'Rating must be between 1 and 5'}), 400
+
+        # Validate optional sub-ratings
+        for field in ['food_rating', 'service_rating', 'ambiance_rating', 'value_rating']:
+            if field in data and data[field] is not None:
+                try:
+                    val = float(data[field])
+                    if val < 1 or val > 5:
+                        return jsonify({'error': f'{field} must be between 1 and 5'}), 400
+                except (TypeError, ValueError):
+                    return jsonify({'error': f'Invalid {field} value'}), 400
+
+        # Validate review text length
+        review_text = data.get('review_text', '')
+        if review_text and len(review_text) > 2000:
+            return jsonify({'error': 'Review text must be less than 2000 characters'}), 400
 
         # Check if user already rated
         existing_rating = Rating.query.filter_by(
@@ -663,8 +742,12 @@ def upload_menu():
             if file.filename == '':
                 return jsonify({'error': 'No selected file'}), 400
 
-            # Save file
-            filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}"
+            # Validate file type
+            if not allowed_file(file.filename):
+                return jsonify({'error': 'Invalid file type. Only images are allowed (png, jpg, jpeg, gif, webp)'}), 400
+
+            # Sanitize and save file
+            filename = sanitize_filename(file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
