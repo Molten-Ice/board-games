@@ -1,0 +1,249 @@
+.camera-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.camera-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  color: white;
+}
+
+.camera-header h1 {
+  font-size: 1.5rem;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.camera-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.camera-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.option-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.option-card h2 {
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 1.5rem;
+}
+
+.option-card p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.divider {
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+  padding: 20px 0;
+}
+
+.camera-view {
+  background: black;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.video-feed {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.camera-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 24px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.control-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.capture-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.capture-circle {
+  width: 70px;
+  height: 70px;
+  border: 4px solid white;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.capture-circle:hover {
+  transform: scale(1.1);
+}
+
+.capture-circle:active {
+  transform: scale(0.95);
+}
+
+.image-preview {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.preview-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.preview-form {
+  padding: 24px;
+}
+
+.preview-form label {
+  display: block;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 24px;
+  transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.preview-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.preview-controls .btn {
+  flex: 1;
+}
+
+.processing-view {
+  background: white;
+  border-radius: 16px;
+  padding: 48px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.processing-view h2 {
+  color: #333;
+  margin: 24px 0 12px;
+  font-size: 1.8rem;
+}
+
+.processing-view p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  border-left: 4px solid #c33;
+  text-align: center;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .camera-container {
+    padding: 12px;
+  }
+
+  .option-card {
+    padding: 24px;
+  }
+
+  .camera-controls {
+    padding: 16px;
+  }
+
+  .control-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .capture-circle {
+    width: 60px;
+    height: 60px;
+  }
+
+  .preview-controls {
+    flex-direction: column;
+  }
+}
